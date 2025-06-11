@@ -1057,7 +1057,7 @@ const startButton=document.getElementById('start-button'),restartButton=document
 const mainTagsContainer=document.getElementById('main-tags-container'),subTagsContainer=document.getElementById('sub-tags-container');
 const timelineLog=document.getElementById('timeline-log');
 
-function init(){populateTags();setupEventListeners();addLogMessage('system','시뮬레이터를 시작할 준비가 되었습니다.')}
+function init(){populateTags();setupEventListeners();addLogMessage('system','시뮬레이터를 시작할 준비가 되었습니다. 본 웹게임은 대롱닥이 만들었습니다롱.')}
 function populateTags(){mainTags.forEach(tag=>{const id=`main-${tag}`,item=`<div class="tag-item"><input type="radio" name="main-tag" id="${id}" value="${tag}"><label for="${id}">${tag}</label></div>`;mainTagsContainer.innerHTML+=item});subTags.forEach(tag=>{const id=`sub-${tag}`,item=`<div class="tag-item"><input type="checkbox" name="sub-tag" id="${id}" value="${tag}"><label for="${id}">${tag}</label></div>`;subTagsContainer.innerHTML+=item})}
 function setupEventListeners(){
     startButton.addEventListener('click',startGame);
