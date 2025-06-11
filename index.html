@@ -215,10 +215,10 @@ const tagCompatibility = {
 };
 const randomEvents = [
     // --- 기존의 강력한 이벤트들 ---
-    { name: "플랫폼 메인 노출", message: "노벨피아 메인 배너를 받아 신규 유입이 폭발합니다!", chance: .03, duration: 5, effect: { inflowMultiplier: 2.5, favoritesAbsoluteBonus: 1000, favoritesMultiplier: 1.2, latestViewsAbsoluteBonus: 500 } },
+    { name: "플랫폼 메인 노출", message: "노벨피아 메인 배너를 받아 신규 유입이 폭발합니다!", chance: .02, duration: 5, effect: { inflowMultiplier: 2.5, favoritesAbsoluteBonus: 1000, favoritesMultiplier: 1.2, latestViewsAbsoluteBonus: 500 } },
     { name: "커뮤니티 입소문", message: "장붕이 중 한 명이 소설 바이럴을 발목 돌리듯 제대로 돌렸습니다!", chance: .07, duration: 10, effect: { inflowMultiplier: 1.8, retentionRate: 1.02, favoritesAbsoluteBonus: 300, favoritesMultiplier: 1.05 } },
-    { name: "악성 리뷰 테러", message: "익살꾸러기들이 당신의 소설에 살인스탭을 밟고 있습니다...", chance: .04, duration: 4, effect: { inflowMultiplier: .6, retentionRate: .95, favoritesPenaltyRate: .05, favoritesAbsolutePenalty: 70, latestViewsAbsolutePenalty: 50 } },
-    { name: "비처녀 논란", message: "소설에 비처녀가 나온다는 음해가 떠돌고야 말았습니다. 억울하지만, 해명할 수가 없습니다.", chance: .03, duration: 2, effect: { retentionRate: .9, favoritesPenaltyRate: .03, favoritesAbsolutePenalty: 50 } },
+    { name: "악성 리뷰 테러", message: "익살꾸러기들이 당신의 소설에 살인스탭을 밟고 있습니다...", chance: .05, duration: 4, effect: { inflowMultiplier: .6, retentionRate: .95, favoritesPenaltyRate: .05, favoritesAbsolutePenalty: 70, latestViewsAbsolutePenalty: 50 } },
+    { name: "비처녀 논란", message: "소설에 비처녀가 나온다는 음해가 떠돌고야 말았습니다. 억울하지만, 해명할 수가 없습니다.", chance: .05, duration: 2, effect: { retentionRate: .9, favoritesPenaltyRate: .03, favoritesAbsolutePenalty: 50 } },
     { name: "잘 적힌 리뷰", message: "훌륭한 필력의 독자 한 명이 극찬 리뷰를 작성했습니다! 뽀삐와 누렁이들이 군침을 흘립니다!!", chance: .02, duration: 7, effect: { inflowMultiplier: 3, favoriteRate: 1.5, favoritesAbsoluteBonus: 500, latestViewsAbsoluteBonus: 150, favoritesMultiplier: 1.05 } },
     { name: "여캐 갈드컵 개최", message: "작품 속 여성 캐릭터들에 대한 정실 논쟁이 발발했습니다! 이게 바이럴이다!", chance: .03, duration: 5, effect: { inflowMultiplier: 2.2, favoriteRate: 1.2, favoritesAbsoluteBonus: 180, favoritesMultiplier: 1.05 } },
     { name: "금손 독자의 팬아트", message: "한 '금손' 독자가 그린 팬아트가 커뮤니티에서 화제가 되어 신규 독자들이 유입됩니다.", chance: .06, duration: 4, effect: { inflowMultiplier: 1.5, retentionRate: 1.01, favoritesAbsoluteBonus: 120, favoritesMultiplier: 1.05 } },
@@ -240,6 +240,16 @@ const randomEvents = [
     { name: "인상적인 조연", message: "주인공이 아닌 조연 캐릭터가 예상 밖의 인기를 끌고 있습니다.", chance: .10, duration: 5, effect: { favoriteRate: 1.03, favoritesAbsoluteBonus: 25, retentionRate: 1.005 } },
     { name: "플랫폼 점검", message: "플랫폼 정기 점검 시간과 연재 시간이 겹쳤습니다. 일부 독자들이 접근에 실패했습니다.", chance: .11, duration: 1, effect: { inflowMultiplier: 0.9 } },
     { name: "오타 지적 댓글", message: "친절한 독자들이 댓글로 오타를 교정해주고 있습니다. 작품의 완성도가 올라갑니다...만 조금 부끄럽습니다.", chance: .15, duration: 2, effect: { retentionRate: 1.002, favoritesAbsolutePenalty: 5 } }
+    { name: "고래 독자 등장", message: "한 '대주주' 독자가 커다란 후원을 보냈습니다! 작가의 창작 의욕이 불타오릅니다!", chance: .07, duration: 3, effect: { favoritesAbsoluteBonus: 100, favoriteRate: 1.1, retentionRate: 1.005 } },
+    { name: "스포일러 테러", message: "한 악질 독자가 1화 댓글에 미래 전개 스포일러를 남겼습니다! 일부 독자들이 김이 빠졌습니다.", chance: .08, duration: 2, effect: { retentionRate: 0.97, favoritesAbsolutePenalty: 30 } },
+    { name: "독자의 심층 분석", message: "한 독자가 소설의 떡밥과 설정을 정리한 분석글을 올렸습니다. 독자들의 이해도가 깊어집니다.", chance: .09, duration: 4, effect: { retentionRate: 1.015, favoritesAbsoluteBonus: 40 } },
+    { name: "의도치 않은 논쟁", message: "의도와 다르게, 한 장면이 독자들 사이에서 뜨거운 논쟁을 일으켰습니다. 댓글창이 불타지만, 어쨌든 관심은 늘었습니다.", chance: .11, duration: 3, effect: { inflowMultiplier: 1.05, retentionRate: 0.99 } },
+    { name: "작가의 건강 악화", message: "작가가 건강상의 이유로 짧은 지각을 예고했습니다. 독자들이 걱정과 응원을 보냅니다.", chance: .06, duration: 2, effect: { retentionRate: 0.98, favoritesAbsoluteBonus: 50 } },
+    { name: "현자타임", message: "엄청난 카타르시스를 느낀 독자들이 '현자타임'에 빠졌습니다. 잠시 소설에서 벗어나려는 독자들이 생깁니다.", chance: .10, duration: 3, effect: { retentionRate: 0.985, inflowMultiplier: 0.95 } },
+    { name: "하꼬 스트리머 언급", message: "한 하꼬 스트리머가 방송에서 당신의 소설을 추천했습니다! 소규모 신규 유입이 발생합니다.", chance: .05, duration: 4, effect: { inflowMultiplier: 1.3, favoritesAbsoluteBonus: 80 } },
+    { name: "뜨끈한 국밥", message: "이번 화는 특별할 건 없지만, 속이 든든해지는 '국밥' 같은 전개였습니다. 독자들이 편안함을 느낍니다.", chance: .12, duration: 2, effect: { retentionRate: 1.01, favoriteRate: 1.05 } },
+    { name: "댓글창 오류", message: "플랫폼 오류로 댓글 작성이 막혔습니다. 소통이 단절되어 독자들이 답답해합니다.", chance: .10, duration: 1, effect: { favoriteRate: 0.9, retentionRate: 0.995 } },
+    { name: "조연 주식 떡상", message: "생각지도 못한 조연의 주가가 폭등했습니다! 해당 캐릭터의 팬들이 결집하기 시작합니다.", chance: .09, duration: 5, effect: { favoritesAbsoluteBonus: 50, favoriteRate: 1.08, recommendationBonus: 2 } }
 ];
 
 // --- START OF MODIFICATION 2: 댓글 다양성 대폭 확장 ---
@@ -260,7 +270,7 @@ const readerComments=[
     {text:"세계관 설정이 너무 탄탄해서 소름돋았어요.", type:"positive", effect:{retentionBonus: .004}},
     {text:"캐릭터들 케미가 너무 좋아요. 외전 존버합니다.", type:"positive", effect:{favoritesAbsoluteBonus: 4, recommendationBonus: 1}},
     {text:"오늘도 제 하루를 책임져주셔서 감사합니다 작가님.", type:"positive", effect:{favoritesAbsoluteBonus: 2}},
-    {text:"무료분에 이런 퀄리티가? 바로 플러스 끊으러 갑니다.", type:"positive", effect:{favoritesAbsoluteBonus: 12}},
+    {text:"이런 퀄리티가? 바로 후원 박으러 갑니다.", type:"positive", effect:{favoritesAbsoluteBonus: 12}},
     // 장르소설 갤러리 스타일 긍정 댓글 10개 추가
     {text:"장갤보고 왔는데... 이게 맞다. 개추 박고 간다.", type:"positive", effect:{favoritesAbsoluteBonus: 15, recommendationBonus: 3}},
     {text:"뇌 비우고 보기 딱 좋노 ㅋㅋㅋㅋㅋ", type:"positive", effect:{retentionBonus: .005}}, // 복잡하지 않고 재미있다는 칭찬. 유지율에 긍정적.
@@ -272,6 +282,16 @@ const readerComments=[
     {text:"지갑 열렸다... 당장 후원 마렵네", type:"positive", effect:{favoritesAbsoluteBonus: 20}}, // 직접적인 수익 창출 의지.
     {text:"이게... '소설'...? 나는 지금까지 뭘 본거지?", type:"positive", effect:{retentionBonus: .005, favoritesAbsoluteBonus: 8}}, // 기존의 상식을 파괴하는 극찬.
     {text:"오늘 연참하면 평생 충성한다", type:"positive", effect:{recommendationBonus: 5}}, // 미래에 대한 기대감과 충성심.
+    {text:"대사 찰진거 보소 ㅋㅋㅋ 작가 필력 좀 치네", type:"positive", effect:{retentionBonus: .004, favoriteRate: 1.02}},
+    {text:"이걸로 한달 버틴다... 작가야 고맙다...", type:"positive", effect:{favoritesAbsoluteBonus: 7}},
+    {text:"내 주식 떡상 ㅋㅋㅋㅋㅋ", type:"positive", effect:{recommendationBonus: 3, favoriteRate: 1.05}},
+    {text:"회사에서 월급루팡하면서 보는데 시간 순삭됨", type:"positive", effect:{retentionBonus: .006}},
+    {text:"이게 섹스지 시발 ㅋㅋㅋㅋㅋ", type:"positive", effect:{favoritesAbsoluteBonus: 11, retentionBonus: .003}},
+    {text:"연출만 좀 더 좋았으면 웹툰화 뚝딱인데", type:"positive", effect:{recommendationBonus: 1}},
+    {text:"조연까지 싹 다 매력적이네. 작가 좀 치노", type:"positive", effect:{favoritesAbsoluteBonus: 6, retentionBonus: .002}},
+    {text:"일단 선작 박고 1화부터 다시 달려봄", type:"positive", effect:{favoritesAbsoluteBonus: 13}},
+    {text:"아껴볼걸... 벌써 최신화네... 망했다...", type:"positive", effect:{retentionBonus: .008}},
+    {text:"누렁이 밥그릇 싹싹 긁어먹었다. 더 '줘'", type:"positive", effect:{favoritesAbsoluteBonus: 4}},
 
     // Negative (기존 16개 + 신규 10개)
     {text:"전개가 너무 느린 거 아닌가요? 답답해요.",type:"negative",effect:{retentionPenalty:.004}},
@@ -301,6 +321,16 @@ const readerComments=[
     {text:"그래서 떡밥 회수는 언제 하냐고!!!", type:"negative", effect:{retentionPenalty: .004}}, // 풀리지 않는 떡밥에 대한 인내심 한계.
     {text:"초반엔 재밌었는데... 유기할 때가 왔나", type:"negative", effect:{retentionPenalty: .007, favoritesAbsolutePenalty: 5}}, // 애정이 식었음을 표현.
     {text:"이럴 시간에 퇴고나 한 번 더 해라", type:"negative", effect:{retentionPenalty: .002, favoritesAbsolutePenalty: 1}}, // 작품 퀄리티에 대한 불만.
+    {text:"또 기억상실? 작가님 클리셰 너무 좋아하는거 아니오", type:"negative", effect:{retentionPenalty: .005, favoriteRate: 0.95}},
+    {text:"악역이 무슨 동네 바보형이냐 긴장감 제로", type:"negative", effect:{retentionPenalty: .006}},
+    {text:"전개속도 KTX급이네; 감정선 다 날려먹음", type:"negative", effect:{retentionPenalty: .005, favoritesAbsolutePenalty: 2}},
+    {text:"히로인 왜 갑자기 흑화함? 개연성 어디감?", type:"negative", effect:{retentionPenalty: .009, favoritesAbsolutePenalty: 5}},
+    {text:"옆집 소설은 연참하는데 여긴 왜...", type:"negative", effect:{favoritesAbsolutePenalty: 4, retentionPenalty: .001}},
+    {text:"주인공만 너무 편애하네. 파워 인플레 감당 안됨.", type:"negative", effect:{retentionPenalty: .003}},
+    {text:"억지 감동, 억지 사이다... 토할 것 같음", type:"negative", effect:{retentionPenalty: .007}},
+    {text:"작가가 자꾸 독자 가르치려 드네", type:"negative", effect:{retentionPenalty: .006, favoritesAbsolutePenalty: 3}},
+    {text:"이 소설은 이제 죽었다. 명복을 빕니다.", type:"negative", effect:{retentionPenalty: .01, favoritesAbsolutePenalty: 10, favoriteRate: 0.8}},
+    {text:"접는다. 수고.", type:"negative", effect:{retentionPenalty: .015, favoritesAbsolutePenalty: 8}},
 ];
 
 const narrativeComments={
@@ -321,6 +351,16 @@ const narrativeComments={
         {text:"슬슬 재밌어지나? 각 잡나?", type:"positive", effect:{retentionBonus: .002}}, // 긍정적 전개에 대한 기대.
         {text:"여기서 더 질질 끌면 민심 떡락한다", type:"negative", effect:{retentionPenalty: .002}}, // 경고성 메시지.
         {text:"이러다 터뜨리면 레전드긴 하겠네", type:"positive", effect:{retentionBonus: .003}}, // 하이리스크 하이리턴에 대한 기대.
+        {text:"복선 까는거 맞지? 그냥 의식의 흐름 아니지?", type:"negative", effect:{retentionPenalty: .001}},
+        {text:"슬슬 위기감 조성해야하는데 너무 평화롭다", type:"negative", effect:{retentionPenalty: .002}},
+        {text:"이러려고 어그로 끌었냐? 빨리 터뜨려라", type:"negative", effect:{retentionPenalty: .001}},
+        {text:"떡밥 노트 정리중이다... 제발 회수해줘", type:"positive", effect:{retentionBonus: .002}},
+        {text:"사이다패스들 오열중 ㅋㅋㅋㅋㅋ", type:"positive", effect:{}},
+        {text:"아직은 밍밍하다... 좀 더 자극적으로 가자", type:"negative", effect:{retentionPenalty: .001}},
+        {text:"주인공 구르기 시작! 팝콘 ON", type:"positive", effect:{retentionBonus: .004}},
+        {text:"작가가 판을 크게 벌리네... 감당 가능?", type:"negative", effect:{}},
+        {text:"이번편은 쉬어가는 화인가", type:"negative", effect:{retentionPenalty: .001}},
+        {text:"이거... 설마... 그 복선인가?", type:"positive", effect:{retentionBonus: .003}},
     ],
     'climax':[
         {text:"와 미쳤다!!! 여기서 끊다니 작가님은 악마야!",type:"climax-comment",effect:{retentionBonus:.01,favoriteRate:1.5,favoritesAbsoluteBonus:10}},
@@ -339,6 +379,16 @@ const narrativeComments={
         {text:"이거 보려고 살아왔다 ㄹㅇ...", type:"climax-comment", effect:{retentionBonus: .011, favoritesAbsoluteBonus: 16}},
         {text:"미쳤다 그냥. 할 말을 잃었습니다.", type:"climax-comment", effect:{retentionBonus: .01, favoriteRate: 1.6, favoritesAbsoluteBonus: 14}},
         {text:"오늘 2편 안주면 작가 집 주소 찾는다 (진심)", type:"climax-comment", effect:{retentionBonus: .018, recommendationBonus: 2}}, // 애정 섞인 협박.
+        {text:"와 ㅋㅋㅋㅋㅋㅋ 작가 미쳤냐고 ㅋㅋㅋㅋㅋㅋ", type:"climax-comment", effect:{retentionBonus: .016, favoriteRate: 1.9, favoritesAbsoluteBonus: 22}},
+        {text:"도파민 폭발한다ㅏㅏㅏㅏㅏ", type:"climax-comment", effect:{retentionBonus: .014, favoriteRate: 1.8, favoritesAbsoluteBonus: 19}},
+        {text:"육성으로 '어?' 소리 나옴", type:"climax-comment", effect:{favoriteRate: 1.6, favoritesAbsoluteBonus: 11}},
+        {text:"오늘 잠 다 잤다. 책임져라 작가.", type:"climax-comment", effect:{retentionBonus: .022}},
+        {text:"미쳤다는 말밖에 안나온다", type:"climax-comment", effect:{retentionBonus: .013, favoritesAbsoluteBonus: 15}},
+        {text:"이게... 웹소설? 이게 예술이다.", type:"climax-comment", effect:{retentionBonus: .015, favoritesAbsoluteBonus: 17}},
+        {text:"몸에 소름돋았음. 전율 그 자체", type:"climax-comment", effect:{retentionBonus: .012, favoritesAbsoluteBonus: 12}},
+        {text:"전 화랑 온도차 뭐냐고 ㅋㅋㅋㅋㅋㅋㅋ", type:"climax-comment", effect:{retentionBonus: .01, favoriteRate: 1.5}},
+        {text:"지렸다... 그냥 지렸다...", type:"climax-comment", effect:{retentionBonus: .011, favoritesAbsoluteBonus: 14}},
+        {text:"작가님 제발 절필만 하지 말아주세요", type:"climax-comment", effect:{retentionBonus: .017, favoritesAbsoluteBonus: 20}},
     ],
     'resolution':[
         {text:"캬... 국밥 한그릇 뚝딱한 것 같은 든든함이다. 사이다!", type:"positive", effect:{retentionBonus: .005, favoritesAbsoluteBonus: 5}},
@@ -357,6 +407,16 @@ const narrativeComments={
         {text:"깔끔했다. 작가 폼 안죽었네", type:"positive", effect:{retentionBonus: .005, favoritesAbsoluteBonus: 3}}, // 작가에 대한 신뢰 확인.
         {text:"이렇게 쉽게 해결된다고? 주인공 너무 편한거 아님?", type:"negative", effect:{retentionPenalty: .003}}, // 데우스 엑스 마키나에 대한 비판.
         {text:"한동안 이것만 기다리면서 살겠네", type:"positive", effect:{retentionBonus: .006, favoritesAbsoluteBonus: 5}}, // 다음 에피소드에 대한 강한 기대감.
+        {text:"후... 뽕 다 빠졌다... 현타오네", type:"system", effect:{retentionPenalty: .002}},
+        {text:"해결방식이 너무 허무맹랑한데... 억지사이다 별로", type:"negative", effect:{retentionPenalty: .005, favoritesAbsolutePenalty: 4}},
+        {text:"모든 조각이 맞춰졌다. 작가 천재냐?", type:"positive", effect:{retentionBonus: .007, favoritesAbsoluteBonus: 8}},
+        {text:"에필로그로 외전 떡밥 뿌리네 ㅋㅋㅋ 장사 잘하노", type:"system", effect:{retentionBonus: .003}},
+        {text:"진짜 완벽한 기승전결이었다.", type:"positive", effect:{retentionBonus: .008, favoritesAbsoluteBonus: 10}},
+        {text:"이걸로 빌드업 한거면 다음 에피는 얼마나 큰거냐?", type:"system", effect:{retentionBonus: .004}},
+        {text:"찜찜하게 끝나네... 작가 의도가 뭐지?", type:"negative", effect:{retentionPenalty: .002}},
+        {text:"끝나니까 아쉽다... 가지마...", type:"positive", effect:{retentionBonus: .003, favoritesAbsoluteBonus: 1}},
+        {text:"다 좋은데 마지막에 걔는 왜 살려줌?", type:"negative", effect:{retentionPenalty: .003, favoritesAbsolutePenalty: 1}},
+        {text:"작가 후기까지 정독했다. 다음 에피 존버한다.", type:"positive", effect:{retentionBonus: .005}},
     ]
 };
 // --- END OF MODIFICATION 2 ---
