@@ -289,7 +289,7 @@ const readerComments=[
     {text:"욕하면서 본다 진짜... 주인공 때문에 암 걸릴 것 같음.", type:"negative", effect:{retentionPenalty: .001, favoritesAbsolutePenalty: 1}}, // 욕하면서 보는건 하차율은 낮음
     {text:"이번 에피소드 보고 하차할지 결정하겠습니다.", type:"negative", effect:{retentionPenalty: .007}},
     {text:"조연들 비중이 너무 공기인데요?", type:"negative", effect:{retentionPenalty: .003, favoritesAbsolutePenalty: 1}},
-    {text:"작가님 지각... 기다리다 목 빠지겠어요.", type:"system", effect:{retentionPenalty: .001}},
+    {text:"작가님 지각... 기다리다 목 빠지겠어요.", type:"negative", effect:{retentionPenalty: .001}},
     // 장르소설 갤러리 스타일 부정 댓글 10개 추가
     {text:"하차각 섰냐? 폼 다 뒤졌네", type:"negative", effect:{retentionPenalty: .009, favoritesAbsolutePenalty: 4}}, // 매우 직접적인 하차 위협.
     {text:"국밥 다 식었다... 이제 못먹겠음", type:"negative", effect:{retentionPenalty: .007, favoritesAbsolutePenalty: 2}}, // 기대했던 사이다가 나오지 않아 실망.
@@ -306,18 +306,18 @@ const readerComments=[
 const narrativeComments={
     'build-up':[
         {text:"슬슬 시동 거는구나... 기대됩니다.",type:"positive",effect:{retentionBonus:.002}},
-        {text:"이번 에피소드 떡밥 까는 중이네. 잘 회수하길.",type:"system",effect:{}},
+        {text:"이번 에피소드 떡밥 까는 중이네. 잘 회수하길.",type:"positive",effect:{}},
         {text:"약간 지루한데... 빨리 뭐라도 터졌으면.",type:"negative",effect:{retentionPenalty:.001}},
         {text:"폭풍전야... 이 긴장감 너무 좋아.", type:"positive", effect:{retentionBonus: .003}},
         {text:"빌드업만 몇 화째냐... 슬슬 피로하다.", type:"negative", effect:{retentionPenalty: .002}},
         // 장르소설 갤러리 스타일 빌드업 댓글 10개 추가
         {text:"슬슬 국밥 데우기 시작하노 ㅋㅋ", type:"positive", effect:{retentionBonus: .003}}, // 사이다 전개에 대한 기대감.
         {text:"고구마 1트럭째다... 작가 뿔났다", type:"negative", effect:{retentionPenalty: .003}}, // 빌드업이 길어지는 것에 대한 불만.
-        {text:"떡밥 크기 실화냐? 이거 다 회수하면 ㅇㅈ한다", type:"system", effect:{retentionBonus: .001}}, // 기대와 의심이 공존.
+        {text:"떡밥 크기 실화냐? 이거 다 회수하면 ㅇㅈ한다", type:"positive", effect:{retentionBonus: .001}}, // 기대와 의심이 공존.
         {text:"숨 참고 흡! 다음 화 내놔!", type:"positive", effect:{retentionBonus: .004}}, // 높은 몰입감 표현.
-        {text:"존버... 존버는 승리한다...", type:"system", effect:{retentionBonus: .001}}, // 밈을 사용한 인내심 표현.
-        {text:"아직은 누렁이 사료 수준. 좀 더 지켜본다.", type:"system", effect:{}}, // 중립적인 관망.
-        {text:"이번 에피만 보고 계속 볼지 결정함", type:"system", effect:{}}, // 독자의 최종 판단 유보.
+        {text:"존버... 존버는 승리한다...", type:"positive", effect:{retentionBonus: .001}}, // 밈을 사용한 인내심 표현.
+        {text:"아직은 누렁이 사료 수준. 좀 더 지켜본다.", type:"positive", effect:{}}, // 중립적인 관망.
+        {text:"이번 에피만 보고 계속 볼지 결정함", type:"negative", effect:{}}, // 독자의 최종 판단 유보.
         {text:"슬슬 재밌어지나? 각 잡나?", type:"positive", effect:{retentionBonus: .002}}, // 긍정적 전개에 대한 기대.
         {text:"여기서 더 질질 끌면 민심 떡락한다", type:"negative", effect:{retentionPenalty: .002}}, // 경고성 메시지.
         {text:"이러다 터뜨리면 레전드긴 하겠네", type:"positive", effect:{retentionBonus: .003}}, // 하이리스크 하이리턴에 대한 기대.
@@ -342,7 +342,7 @@ const narrativeComments={
     ],
     'resolution':[
         {text:"캬... 국밥 한그릇 뚝딱한 것 같은 든든함이다. 사이다!", type:"positive", effect:{retentionBonus: .005, favoritesAbsoluteBonus: 5}},
-        {text:"떡밥 회수 깔끔해서 좋았습니다. 다음 에피도 기대할게요.", type:"system", effect:{retentionBonus: .004}},
+        {text:"떡밥 회수 깔끔해서 좋았습니다. 다음 에피도 기대할게요.", type:"positive", effect:{retentionBonus: .004}},
         {text:"응? 이렇게 끝? 뭔가 좀 허무한데...", type:"negative", effect:{retentionPenalty: .003}},
         {text:"에필로그까지 완벽했다. 잠시 쉬고 다음 스토리 가시죠!", type:"positive", effect:{retentionBonus: .003, favoritesAbsoluteBonus: 3}},
         {text:"갈등 해결 방식이 너무 단순한 거 아닌가요?", type:"negative", effect:{retentionPenalty: .002, favoritesAbsolutePenalty: 2}},
