@@ -239,7 +239,7 @@ const randomEvents = [
     { name: "지각...!", message: "예상치 못한 사정으로 업로드 시간이 조금 늦었습니다. 독자들이 애타게 기다립니다.", chance: .13, duration: 1, effect: { retentionRate: .98, latestViewsAbsolutePenalty: 20 } },
     { name: "인상적인 조연", message: "주인공이 아닌 조연 캐릭터가 예상 밖의 인기를 끌고 있습니다.", chance: .10, duration: 5, effect: { favoriteRate: 1.03, favoritesAbsoluteBonus: 25, retentionRate: 1.005 } },
     { name: "플랫폼 점검", message: "플랫폼 정기 점검 시간과 연재 시간이 겹쳤습니다. 일부 독자들이 접근에 실패했습니다.", chance: .11, duration: 1, effect: { inflowMultiplier: 0.9 } },
-    { name: "오타 지적 댓글", message: "친절한 독자들이 댓글로 오타를 교정해주고 있습니다. 작품의 완성도가 올라갑니다...만 조금 부끄럽습니다.", chance: .15, duration: 2, effect: { retentionRate: 1.002, favoritesAbsolutePenalty: 5 } }
+    { name: "오타 지적 댓글", message: "친절한 독자들이 댓글로 오타를 교정해주고 있습니다. 작품의 완성도가 올라갑니다...만 조금 부끄럽습니다.", chance: .15, duration: 2, effect: { retentionRate: 1.002, favoritesAbsolutePenalty: 5 } },
     { name: "고래 독자 등장", message: "한 '대주주' 독자가 커다란 후원을 보냈습니다! 작가의 창작 의욕이 불타오릅니다!", chance: .07, duration: 3, effect: { favoritesAbsoluteBonus: 100, favoriteRate: 1.1, retentionRate: 1.005 } },
     { name: "스포일러 테러", message: "한 악질 독자가 1화 댓글에 미래 전개 스포일러를 남겼습니다! 일부 독자들이 김이 빠졌습니다.", chance: .08, duration: 2, effect: { retentionRate: 0.97, favoritesAbsolutePenalty: 30 } },
     { name: "독자의 심층 분석", message: "한 독자가 소설의 떡밥과 설정을 정리한 분석글을 올렸습니다. 독자들의 이해도가 깊어집니다.", chance: .09, duration: 4, effect: { retentionRate: 1.015, favoritesAbsoluteBonus: 40 } },
@@ -249,7 +249,32 @@ const randomEvents = [
     { name: "하꼬 스트리머 언급", message: "한 하꼬 스트리머가 방송에서 당신의 소설을 추천했습니다! 소규모 신규 유입이 발생합니다.", chance: .05, duration: 4, effect: { inflowMultiplier: 1.3, favoritesAbsoluteBonus: 80 } },
     { name: "뜨끈한 국밥", message: "이번 화는 특별할 건 없지만, 속이 든든해지는 '국밥' 같은 전개였습니다. 독자들이 편안함을 느낍니다.", chance: .12, duration: 2, effect: { retentionRate: 1.01, favoriteRate: 1.05 } },
     { name: "댓글창 오류", message: "플랫폼 오류로 댓글 작성이 막혔습니다. 소통이 단절되어 독자들이 답답해합니다.", chance: .10, duration: 1, effect: { favoriteRate: 0.9, retentionRate: 0.995 } },
-    { name: "조연 주식 떡상", message: "생각지도 못한 조연의 주가가 폭등했습니다! 해당 캐릭터의 팬들이 결집하기 시작합니다.", chance: .09, duration: 5, effect: { favoritesAbsoluteBonus: 50, favoriteRate: 1.08, recommendationBonus: 2 } }
+    { name: "조연 주식 떡상", message: "생각지도 못한 조연의 주가가 폭등했습니다! 해당 캐릭터의 팬들이 결집하기 시작합니다.", chance: .09, duration: 5, effect: { favoritesAbsoluteBonus: 50, favoriteRate: 1.08, recommendationBonus: 2 } },
+{
+    name: "스트레스로 인한 급완결",
+    message: "작품 세계에 운석을 떨어트리고 싶어졌습니다! 모든 것이 무로 돌아가며 이야기는 갑작스럽게 끝을 맺습니다...",
+    chance: .001, // 0.1% 확률
+    duration: 1,
+    effect: { isGameEnding: true }, // 게임 종료를 위한 특수 플래그
+    endReason: "급완결"
+},
+{
+    name: "주화입마로 인한 연재 중단",
+    message: "어느 날 갑자기 작가가 잠적했습니다. 독자들의 기다림 속에서 소설은 미완으로 남게 됩니다.",
+    chance: .003, // 0.3% 확률
+    duration: 1,
+    effect: { isGameEnding: true },
+    endReason: "작가 잠적으로 인한 연재 중단"
+},
+{
+    name: "해외 출판사 계약",
+    message: "작품의 가능성을 본 해외 대형 출판사에서 거액의 계약을 제안했습니다! 작가는 모든 것을 정리하고 해외로 떠납니다...",
+    chance: .001, // 0.1% 확률
+    duration: 1,
+    effect: { isGameEnding: true },
+    endReason: "해외 진출로 인한 조기 완결"
+}
+
 ];
 
 // --- START OF MODIFICATION 2: 댓글 다양성 대폭 확장 ---
@@ -518,11 +543,47 @@ finalRetentionRate=Math.min(finalRetentionRate,0.999);
 readersPropagating*=finalRetentionRate}
 gameState.readersReachedLatest=readersPropagating;gameState.totalFavorites+=(newReaders*.05*eventEffects.favoriteRate*commentEffect.favoriteRate)+commentEffect.favoritesAbsoluteBonus-commentEffect.favoritesAbsolutePenalty;if(gameState.totalFavorites<0)gameState.totalFavorites=0;gameState.totalRecommendations+=newReaders*.01+commentEffect.recommendationBonus;updateUI()}
 function calculatePublicAppeal(main,subs){let score=1;if(tagCompatibility[main]){subs.forEach(sub=>{score*=tagCompatibility[main][sub]||.9})}gameState.publicAppealScore=score}
-function handleRandomEvents(){if(gameState.activeEvents.length>0)return;const eventPool=randomEvents.filter(e=>{if(e.name==="레전드 회차"&&gameState.narrativeState!=='climax')return false;return true});for(const event of eventPool){if(Math.random()<event.chance){const newEvent={...event,remaining:event.duration};gameState.activeEvents.push(newEvent);let type='event';if(newEvent.effect.favoritesPenaltyRate||newEvent.effect.favoritesAbsolutePenalty||newEvent.effect.latestViewsAbsolutePenalty){type='penalty'}
-if(newEvent.effect.favoritesMultiplier) gameState.totalFavorites *= newEvent.effect.favoritesMultiplier;
-if(newEvent.effect.favoritesAbsoluteBonus){gameState.totalFavorites+=newEvent.effect.favoritesAbsoluteBonus}if(newEvent.effect.favoritesAbsolutePenalty){gameState.totalFavorites-=newEvent.effect.favoritesAbsolutePenalty;if(gameState.totalFavorites<0)gameState.totalFavorites=0}
-if (newEvent.effect.latestViewsAbsoluteBonus && gameState.chapter > 0) { for (let i = 0; i < gameState.chapter; i++) { gameState.chapterViews[i] += newEvent.effect.latestViewsAbsoluteBonus; } }
-if(newEvent.effect.latestViewsAbsolutePenalty&&gameState.chapter>0){gameState.chapterViews[gameState.chapter-1]-=newEvent.effect.latestViewsAbsolutePenalty;if(gameState.chapterViews[gameState.chapter-1]<0)gameState.chapterViews[gameState.chapter-1]=0}if(newEvent.effect.favoritesPenaltyRate){gameState.totalFavorites*=(1-newEvent.effect.favoritesPenaltyRate)}addLogMessage(type,`[이벤트] ${newEvent.message}`,gameState.date);break}}}
+
+function handleRandomEvents() {
+    if (gameState.activeEvents.length > 0) return;
+    const eventPool = randomEvents.filter(e => {
+        if (e.name === "레전드 회차" && gameState.narrativeState !== 'climax') return false;
+        return true
+    });
+    for (const event of eventPool) {
+        if (Math.random() < event.chance) {
+            
+            // --- 여기가 수정된 핵심 로직입니다 ---
+            // 1. 게임 종료 이벤트인지 확인
+            if (event.effect && event.effect.isGameEnding) {
+                addLogMessage('penalty', `[치명적 이벤트] ${event.message}`, gameState.date);
+                endGame(event.endReason || '급완결'); // 설정된 종료 사유로 게임 종료
+                break; // 이벤트 발생 후 루프 종료
+            } 
+            
+            // 2. 기존의 일반 이벤트 처리 (게임 종료가 아닐 경우)
+            else {
+                const newEvent = { ...event, remaining: event.duration };
+                gameState.activeEvents.push(newEvent);
+                let type = 'event';
+                if (newEvent.effect.favoritesPenaltyRate || newEvent.effect.favoritesAbsolutePenalty || newEvent.effect.latestViewsAbsolutePenalty) {
+                    type = 'penalty';
+                }
+                
+                if (newEvent.effect.favoritesMultiplier) gameState.totalFavorites *= newEvent.effect.favoritesMultiplier;
+                if (newEvent.effect.favoritesAbsoluteBonus) { gameState.totalFavorites += newEvent.effect.favoritesAbsoluteBonus; }
+                if (newEvent.effect.favoritesAbsolutePenalty) { gameState.totalFavorites -= newEvent.effect.favoritesAbsolutePenalty; if (gameState.totalFavorites < 0) gameState.totalFavorites = 0; }
+                if (newEvent.effect.latestViewsAbsoluteBonus && gameState.chapter > 0) { for (let i = 0; i < gameState.chapter; i++) { gameState.chapterViews[i] += newEvent.effect.latestViewsAbsoluteBonus; } }
+                if (newEvent.effect.latestViewsAbsolutePenalty && gameState.chapter > 0) { gameState.chapterViews[gameState.chapter - 1] -= newEvent.effect.latestViewsAbsolutePenalty; if (gameState.chapterViews[gameState.chapter - 1] < 0) gameState.chapterViews[gameState.chapter - 1] = 0; }
+                if (newEvent.effect.favoritesPenaltyRate) { gameState.totalFavorites *= (1 - newEvent.effect.favoritesPenaltyRate); }
+                
+                addLogMessage(type, `[이벤트] ${newEvent.message}`, gameState.date);
+                break; // 이벤트 발생 후 루프 종료
+            }
+        }
+    }
+}
+
 function updateActiveEvents(){gameState.activeEvents.forEach(e=>e.remaining--);gameState.activeEvents=gameState.activeEvents.filter(e=>e.remaining>0)}
 function getActiveEventEffects(){const e={inflowMultiplier:1,retentionRate:1,favoriteRate:1};gameState.activeEvents.forEach(v=>{for(const k in v.effect){if(!k.includes('Absolute')&&!k.includes('PenaltyRate')&&!k.includes('Multiplier'))e[k]*=v.effect[k]}});return e}
 function addLogMessage(type,message,date,chapter=null){const entry=document.createElement('div');entry.className='log-entry';let metaText='시스템 메시지';if(date){metaText=`${date.getMonth()+1}월 ${date.getDate()}일`;if(['positive','negative','climax-comment'].includes(type)){metaText+=` / ${chapter}화 반응`}else if(type==='system'){metaText+=` / 시스템`}}entry.innerHTML=`<p class="log-meta">${metaText}</p><p class="log-text ${type}">${message}</p>`;timelineLog.prepend(entry);if(timelineLog.children.length>50)timelineLog.lastChild.remove()}
