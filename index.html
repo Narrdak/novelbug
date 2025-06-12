@@ -3,67 +3,472 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>월천킥 작가 시뮬레이터! Beta</title>
+    <title>월천킥 작가 시뮬레이터! Beta 2.0</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
-        :root{--primary-color:#1877f2;--green-color:#42b72a;--red-color:#fa3e3e;--light-bg:#f0f2f5;--widget-bg:#f7f7f7;--text-color:#1c1e21;--subtext-color:#606770;--positive-color:#2a7bde;--negative-color:#f5a623;--system-color:#6c757d; --climax-color: #28a745;}
-        body{font-family:'Noto Sans KR',sans-serif;background-color:var(--light-bg);color:var(--text-color);margin:0;padding:20px;box-sizing:border-box}
-        #app-wrapper{display:flex;gap:20px;align-items:flex-start;max-width:1200px;margin:0 auto}
-        .container{flex-grow:1;background:white;padding:25px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.1)}
-        h1,h2,h3{text-align:center;color:var(--text-color)}
-        h3.chart-title, h3.section-title{margin-top:20px;margin-bottom:10px;border-bottom:1px solid #eee;padding-bottom:10px;text-align:left;font-size:1.1em}
-        #setup-screen .form-group{margin-bottom:20px}
-        #setup-screen label{display:block;font-weight:700;margin-bottom:8px;color:var(--subtext-color)}
-        #setup-screen input[type="text"]{width:100%;padding:10px;border:1px solid #dddfe2;border-radius:6px;box-sizing:border-box}
-        #setup-screen .tag-container{display:flex;flex-wrap:wrap;gap:10px}
-        #setup-screen .tag-item input{display:none}
-        #setup-screen .tag-item label{display:block;padding:8px 15px;border:1px solid #ccd0d5;border-radius:16px;cursor:pointer;transition:all .2s ease;margin-bottom:0;font-weight:400}
-        #setup-screen .tag-item input:checked+label{background-color:var(--primary-color);color:white;border-color:var(--primary-color)}
-        #start-button{width:100%;padding:12px;background-color:var(--green-color);color:white;border:none;border-radius:6px;font-size:1.1em;font-weight:700;cursor:pointer;transition:background-color .2s ease}
-        #start-button:hover{background-color:#36a420}
-        #sub-tag-limit-msg{color:var(--red-color);font-size:.9em;margin-top:5px;height:1em}
-        #simulation-screen{display:none}
-        #novel-title-display{background-color:#e7f3ff;padding:10px;border-radius:8px;border-left:5px solid var(--primary-color)}
-        #novel-tags-display {text-align: center; color: var(--subtext-color); font-size: 0.95em; margin-top: 5px; margin-bottom: 15px; font-weight: 700;}
-        .earnings-info-bar { background-color: var(--widget-bg); padding: 12px; border-radius: 8px; text-align: center; margin-bottom: 20px; display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 15px; }
-        .earnings-info-bar span { font-size: 0.9em; color: var(--text-color); font-weight: 500;}
-        .speed-control-bar { text-align: center; margin-bottom: 20px; display: flex; justify-content: center; gap: 10px; }
-        .speed-control-bar .speed-button { padding: 6px 12px; border: 1px solid #ccd0d5; background-color: #f0f2f5; border-radius: 16px; cursor: pointer; transition: all .2s ease; font-size: 0.9em; }
-        .speed-control-bar .speed-button:hover { background-color: #e4e6e9; }
-        .speed-control-bar .speed-button.active { background-color: var(--primary-color); color: white; border-color: var(--primary-color); font-weight: 700; }
-        .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:15px;margin:20px 0}
-        .stat-box{background:var(--widget-bg);padding:15px;border-radius:8px;text-align:center}
-        .stat-box .label{font-size:.85em;color:var(--subtext-color);margin-bottom:5px}
-        .stat-box .value{font-size:1.3em;font-weight:700;color:var(--text-color)}
-        #narrative-progress-container{margin-top:10px;margin-bottom:20px}
-        #narrative-progress-bar{width:100%;background-color:#e9ecef;border-radius:8px;overflow:hidden;height:25px;position:relative}
-        #narrative-progress-fill{height:100%;border-radius:8px;transition:width .5s ease-in-out,background-color .5s ease}
-        #narrative-progress-fill.build-up{background-color:var(--primary-color)}
-        #narrative-progress-fill.climax{background-color:var(--climax-color)}
-        #narrative-progress-fill.resolution{background-color:var(--system-color)}
-        #narrative-status-text{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:white;font-weight:700;font-size:.9em;text-shadow:1px 1px 2px rgba(0,0,0,.5)}
-        #log-sidebar{flex-shrink:0;width:320px;height:calc(100vh - 40px);background:white;padding:20px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.1);overflow-y:auto;position:sticky;top:20px}
-        #log-sidebar h3{margin-top:0}
-        .log-entry{margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #eee}
-        .log-meta{font-size:.8em;color:var(--subtext-color);margin:0 0 4px 0}
-        .log-text{margin:0;font-size:.95em}
-        .log-text.event{font-weight:700;color:var(--primary-color)}
-        .log-text.climax-comment{font-weight:700;color:var(--climax-color)}
-        .log-text.penalty{font-weight:700;color:var(--red-color)}
-        .log-text.positive{color:var(--positive-color)}
-        .log-text.negative{color:var(--negative-color)}
-        .log-text.system{color:var(--system-color);font-style:italic}
-        #result-modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;overflow:auto;background-color:rgba(0,0,0,.6);align-items:center;justify-content:center}
-        .modal-content{background-color:#fff;margin:auto;padding:30px;border-radius:12px;width:90%;max-width:500px;text-align:center;box-shadow:0 5px 15px rgba(0,0,0,.3);animation:fadeIn .3s}
-        .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:left;margin:20px 0}
-        .result-grid strong{color:var(--subtext-color)}
-        @keyframes fadeIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}
-        #result-title{color:var(--primary-color)}
-        #restart-button{padding:10px 20px;background-color:var(--primary-color);color:white;border:none;border-radius:6px;font-size:1em;cursor:pointer;margin-top:20px}
-        .chart-row{display:flex;gap:20px;margin-top:20px}
-        .chart-wrapper{flex:1;min-width:0}
-        @media(max-width:768px){#app-wrapper{flex-direction:column}#log-sidebar{width:100%;height:auto;margin-top:20px;position:static}.chart-row{flex-direction:column}}
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+        
+        :root {
+            --primary-color: #4f6dff;
+            --green-color: #2ecc71;
+            --red-color: #e74c3c;
+            --light-bg: #1a1a2e; /* 전체 배경색 */
+            --widget-bg: #1f2233; /* 컨테이너, 사이드바 배경 */
+            --widget-bg-alt: #2a2d42; /* 스탯 박스 등 내부 요소 배경 */
+            --text-color: #e0e0e0;
+            --subtext-color: #a0a0b0;
+            --positive-color: #3498db;
+            --negative-color: #f39c12;
+            --system-color: #95a5a6;
+            --climax-color: #9b59b6;
+            --border-color: #3b3f5c;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #app-wrapper {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .container {
+            flex-grow: 1;
+            background: var(--widget-bg);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+        }
+
+        h1, h2, h3 {
+            text-align: center;
+            color: var(--text-color);
+            font-weight: 700;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-shadow: 0 0 10px rgba(79, 109, 255, 0.5);
+        }
+
+        h3.chart-title, h3.section-title {
+            margin-top: 25px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            text-align: left;
+            font-size: 1.2em;
+            color: #e0e0e0;
+        }
+        
+        /* 설정 화면 스타일 */
+        #setup-screen .form-group {
+            margin-bottom: 25px;
+        }
+        #setup-screen label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--subtext-color);
+            font-size: 1.05em;
+        }
+        #setup-screen input[type="text"],
+        #setup-screen textarea { /* 소개글 필드 추가 */
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            font-size: 1em;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        #setup-screen textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        #setup-screen input[type="text"]:focus,
+        #setup-screen textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 109, 255, 0.3);
+        }
+
+        #setup-screen .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        #setup-screen .tag-item input {
+            display: none;
+        }
+        #setup-screen .tag-item label {
+            display: block;
+            padding: 8px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all .2s ease;
+            margin-bottom: 0;
+            font-weight: 500;
+            background-color: var(--widget-bg-alt);
+        }
+        #setup-screen .tag-item input:checked + label {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        #start-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, var(--green-color), #27ae60);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .3s ease;
+            margin-top: 10px;
+        }
+        #start-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        #sub-tag-limit-msg {
+            color: var(--red-color);
+            font-size: .9em;
+            margin-top: 5px;
+            height: 1em;
+        }
+
+        /* 시뮬레이션 화면 스타일 */
+        #simulation-screen {
+            display: none;
+        }
+        #novel-title-display {
+            background-color: rgba(79, 109, 255, 0.1);
+            padding: 15px 20px;
+            border-radius: 8px;
+            border-left: 5px solid var(--primary-color);
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+        /* 추가: 작가명, 소개글 표시 */
+        #author-name-display {
+            text-align: center;
+            font-size: 1.1em;
+            color: var(--subtext-color);
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        #novel-synopsis-display {
+            background-color: var(--widget-bg-alt);
+            padding: 15px;
+            border-radius: 8px;
+            color: var(--subtext-color);
+            font-size: 0.95em;
+            line-height: 1.6;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            white-space: pre-wrap; /* 줄바꿈 적용 */
+        }
+        #novel-tags-display {
+            text-align: center;
+            color: var(--primary-color);
+            font-size: 0.95em;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .earnings-info-bar {
+            background-color: var(--widget-bg-alt);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .earnings-info-bar span {
+            font-size: 0.9em;
+            color: var(--subtext-color);
+            font-weight: 500;
+        }
+
+        .speed-control-bar {
+            text-align: center;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .speed-control-bar .speed-button {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            background-color: var(--widget-bg-alt);
+            color: var(--text-color);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all .2s ease;
+            font-size: 0.9em;
+        }
+        .speed-control-bar .speed-button:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: #fff;
+        }
+        .speed-control-bar .speed-button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-box {
+            background: var(--widget-bg-alt);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid transparent;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .stat-box:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary-color);
+        }
+        .stat-box .label {
+            font-size: .9em;
+            color: var(--subtext-color);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .stat-box .value {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+
+        #narrative-progress-container {
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        #narrative-progress-bar {
+            width: 100%;
+            background-color: var(--light-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            height: 25px;
+            position: relative;
+            border: 1px solid var(--border-color);
+        }
+        #narrative-progress-fill {
+            height: 100%;
+            border-radius: 8px;
+            transition: width .5s ease-in-out, background-color .5s ease;
+        }
+        #narrative-progress-fill.build-up { background: linear-gradient(90deg, #3498db, #2980b9); }
+        #narrative-progress-fill.climax { background: linear-gradient(90deg, var(--climax-color), #8e44ad); }
+        #narrative-progress-fill.resolution { background: linear-gradient(90deg, var(--system-color), #7f8c8d); }
+        #narrative-status-text {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: 700;
+            font-size: .9em;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+        }
+        
+        #log-sidebar {
+            flex-shrink: 0;
+            width: 350px;
+            height: calc(100vh - 40px);
+            background: var(--widget-bg);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+            overflow-y: auto;
+            position: sticky;
+            top: 20px;
+        }
+        #log-sidebar h3 {
+            margin-top: 0;
+            color: #e0e0e0;
+        }
+        .log-entry {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+            opacity: 0.9;
+        }
+        .log-meta {
+            font-size: .8em;
+            color: var(--subtext-color);
+            margin: 0 0 5px 0;
+        }
+        .log-text {
+            margin: 0;
+            font-size: .95em;
+            line-height: 1.5;
+        }
+        .log-text.event { font-weight: 700; color: var(--primary-color); }
+        .log-text.climax-comment { font-weight: 700; color: var(--climax-color); }
+        .log-text.penalty { font-weight: 700; color: var(--red-color); }
+        .log-text.positive { color: var(--positive-color); }
+        .log-text.negative { color: var(--negative-color); }
+        .log-text.system { color: var(--system-color); font-style: italic; }
+
+        /* 결과 모달 CSS */
+        #result-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, .8);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: var(--widget-bg);
+            border: 1px solid var(--border-color);
+            margin: auto;
+            padding: 30px 40px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 650px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, .5);
+            animation: fadeIn .3s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(.95) }
+            to { opacity: 1; transform: scale(1) }
+        }
+        #result-title { color: var(--primary-color); margin-bottom: 5px; font-size: 2em; }
+        #final-author-name { font-size: 1.2em; color: var(--text-color); margin-top: 0; margin-bottom: 10px; }
+        #final-novel-synopsis { font-size: 0.9em; color: var(--subtext-color); margin-bottom: 20px; white-space: pre-wrap; line-height: 1.6; background-color: var(--widget-bg-alt); padding: 10px; border-radius: 8px; }
+
+        #end-reason { color: var(--subtext-color); margin-top: 0; margin-bottom: 25px; font-size: 1.1em; }
+        
+        .result-section { margin-bottom: 25px; }
+        .result-section h3 {
+            font-size: 1.3em;
+            text-align: left;
+            color: var(--text-color);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        .result-section h3 i { margin-right: 10px; color: var(--primary-color); }
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            text-align: left;
+        }
+        
+        .result-item {
+            background-color: var(--widget-bg-alt);
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 1px solid var(--border-color);
+        }
+        .result-item i { font-size: 1.8em; color: var(--primary-color); opacity: 0.8; width: 30px; text-align: center; }
+        .result-item .text-content { display: flex; flex-direction: column; }
+        .result-item .label { font-size: 0.9em; color: var(--subtext-color); margin-bottom: 4px; }
+        .result-item .value { font-size: 1.35em; font-weight: 700; color: var(--text-color); }
+        .result-item .value.currency { color: var(--green-color); }
+
+        /* ★★★ 변경점 4번: 업적 CSS 추가 ★★★ */
+        .achievement-item {
+            background-color: var(--widget-bg-alt);
+            border: 1px solid var(--border-color);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            text-align: left;
+            font-size: 0.95em;
+        }
+
+        #modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        #restart-button, #close-modal-button {
+            padding: 12px 30px;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 700;
+        }
+        #restart-button {
+             background: var(--primary-color);
+        }
+        #restart-button:hover { background-color: #3d5bf0; box-shadow: 0 5px 15px rgba(79, 109, 255, 0.3); }
+        
+        /* ★★★ 변경점 1번: 확인 버튼 CSS 추가 ★★★ */
+        #close-modal-button {
+            background: var(--system-color);
+        }
+        #close-modal-button:hover {
+            background: #819092;
+            box-shadow: 0 5px 15px rgba(149, 165, 166, 0.3);
+        }
+
+
+        .chart-row { display: flex; gap: 20px; margin-top: 20px; }
+        .chart-wrapper { flex: 1; min-width: 0; background: var(--widget-bg-alt); padding: 15px; border-radius: 12px; }
+        
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            #app-wrapper { flex-direction: column }
+            #log-sidebar { width: 100%; height: 300px; margin-top: 20px; position: static; }
+            .chart-row { flex-direction: column }
+            .result-grid { grid-template-columns: 1fr; }
+            .container { padding: 20px; }
+        }
     </style>
 </head>
 <body>
@@ -71,8 +476,19 @@
     <div class="container">
         <!-- 설정 화면 -->
         <div id="setup-screen">
-            <h1>월천킥 작가 시뮬레이터! Beta</h1>
-            <div class="form-group"><label for="novel-title">작품 제목</label><input type="text" id="novel-title" placeholder="나만의 웹소설 제목을 지어주세요"></div>
+            <h1>월천킥 작가 시뮬레이터! Beta 2.0</h1>
+            <div class="form-group">
+                <label for="novel-title">작품 제목</label>
+                <input type="text" id="novel-title" placeholder="나만의 웹소설 제목을 지어주세요">
+            </div>
+            <div class="form-group">
+                <label for="author-name">작가명</label>
+                <input type="text" id="author-name" placeholder="필명을 입력해주세요">
+            </div>
+            <div class="form-group">
+                <label for="novel-synopsis">소개글</label>
+                <textarea id="novel-synopsis" placeholder="독자들의 마음을 사로잡을 소개글을 작성해보세요"></textarea>
+            </div>
             <div class="form-group"><label>메인 태그 (1개 선택)</label><div id="main-tags-container" class="tag-container"></div></div>
             <div class="form-group"><label>서브 태그 (최대 6개 선택)</label><div id="sub-tags-container" class="tag-container"></div><p id="sub-tag-limit-msg"></p></div>
             <button id="start-button">연재 시작!</button>
@@ -81,7 +497,9 @@
         <!-- 시뮬레이션 화면 -->
         <div id="simulation-screen">
             <h2 id="novel-title-display"></h2>
+            <p id="author-name-display"></p>
             <p id="novel-tags-display"></p>
+            <p id="novel-synopsis-display"></p>
             <div class="earnings-info-bar">
                 <span id="writing-time-per-chapter"></span>
                 <span id="current-earnings"></span>
@@ -91,6 +509,7 @@
                 <button id="speed-1x" class="speed-button active">1배속</button>
                 <button id="speed-1_5x" class="speed-button">1.5배속</button>
                 <button id="speed-2x" class="speed-button">2배속</button>
+                <button id="speed-4x" class="speed-button">4배속</button>
             </div>
             <div class="stats-grid">
                 <div class="stat-box"><div class="label">현재 화수</div><div id="current-chapter" class="value">0</div></div>
@@ -101,13 +520,8 @@
                 <div class="stat-box"><div class="label">총 조회수</div><div id="total-views" class="value">0</div></div>
                 <div class="stat-box"><div class="label">최고 최신화 조회수</div><div id="peak-latest-views" class="value">0</div></div>
                 <div class="stat-box"><div class="label">최고 일일 조회수</div><div id="peak-daily-growth" class="value">0</div></div>
-                <!-- ★★★ 주요 변경사항 1 시작: '평균 최신화 조회수'를 '실시간 랭킹'으로 변경 ★★★ -->
-                <div class="stat-box">
-                    <div class="label">실시간 랭킹</div>
-                    <div id="realtime-ranking" class="value">순위권 밖</div>
-                </div>
-                <!-- ★★★ 주요 변경사항 1 끝 ★★★ -->
-                <div class="stat-box"><div class="label">평균 일일 조회수</div><div id="avg-daily-growth" class="value">0</div></div>
+                <div class="stat-box"><div class="label">실시간 랭킹</div><div id="realtime-ranking" class="value">순위권 밖</div></div>
+                <div class="stat-box"><div class="label">최고 실시간 랭킹</div><div id="peak-realtime-ranking" class="value">순위권 밖</div></div>
             </div>
 
             <div>
@@ -132,932 +546,67 @@
 <!-- 결과 모달 -->
 <div id="result-modal">
     <div class="modal-content">
-        <h2 id="result-title"></h2><p id="end-reason"></p><hr>
-        <h3>최종 성과</h3>
-        <div class="result-grid">
-            <p><strong>총 조회수:</strong> <span id="final-total-views"></span></p><p><strong>총 선호작:</strong> <span id="final-total-favorites"></span></p>
-            <p><strong>총 알림:</strong> <span id="final-total-recommendations"></span></p><p><strong>총 집필 시간:</strong> <span id="final-writing-time"></span>시간</p>
+        <h2 id="result-title"></h2>
+        <h3 id="final-author-name"></h3>
+        <p id="end-reason"></p>
+        <p id="final-novel-synopsis"></p>
+        
+        <div class="result-section">
+            <h3><i class="fa-solid fa-chart-line"></i> 최종 성과</h3>
+            <div class="result-grid">
+                <div class="result-item"><i class="fa-solid fa-eye"></i><div class="text-content"><span class="label">총 조회수</span><span id="final-total-views" class="value"></span></div></div>
+                <div class="result-item"><i class="fa-solid fa-star"></i><div class="text-content"><span class="label">총 선호작</span><span id="final-total-favorites" class="value"></span></div></div>
+                <div class="result-item"><i class="fa-solid fa-trophy"></i><div class="text-content"><span class="label">최고 실시간 랭킹</span><span id="final-peak-ranking" class="value"></span></div></div>
+                <!-- ★★★ 변경점 2번: '평균 최신화 조회수'를 '최고 일일 조회수'로 변경 ★★★ -->
+                <div class="result-item"><i class="fa-solid fa-arrow-trend-up"></i><div class="text-content"><span class="label">최고 일일 조회수</span><span id="final-peak-daily-growth" class="value"></span></div></div>
+            </div>
         </div>
-        <h3>수익 정산</h3>
-        <div class="result-grid">
-            <p><strong>총 수익:</strong> <span id="final-earnings"></span>원</p><p><strong>시급:</strong> <span id="final-hourly-wage"></span>원</p>
+
+        <div class="result-section">
+            <h3><i class="fa-solid fa-coins"></i> 수익 정산</h3>
+            <div class="result-grid">
+                <div class="result-item"><i class="fa-solid fa-sack-dollar"></i><div class="text-content"><span class="label">총 수익</span><span id="final-earnings" class="value currency"></span></div></div>
+                <div class="result-item"><i class="fa-solid fa-clock"></i><div class="text-content"><span class="label">시급</span><span id="final-hourly-wage" class="value currency"></span></div></div>
+                <div class="result-item"><i class="fa-solid fa-calendar-days"></i><div class="text-content"><span class="label">월급 환산</span><span id="final-monthly-wage" class="value currency"></span></div></div>
+                <div class="result-item"><i class="fa-solid fa-pencil"></i><div class="text-content"><span class="label">총 집필 시간</span><span id="final-writing-time" class="value"></span></div></div>
+            </div>
         </div>
-        <button id="restart-button">다시하기</button>
+        
+        <div class="result-section">
+            <h3><i class="fa-solid fa-book-open-reader"></i> 연재 기록</h3>
+            <div class="result-grid">
+                <div class="result-item"><i class="fa-solid fa-bolt"></i><div class="text-content"><span class="label">총 이벤트 발생 수</span><span id="final-total-events" class="value"></span></div></div>
+                 <div class="result-item"><i class="fa-solid fa-face-smile"></i><div class="text-content"><span class="label">긍정적 댓글</span><span id="final-positive-comments" class="value"></span></div></div>
+                 <div class="result-item"><i class="fa-solid fa-face-frown"></i><div class="text-content"><span class="label">부정적 댓글</span><span id="final-negative-comments" class="value"></span></div></div>
+                <div class="result-item"><i class="fa-solid fa-bell"></i><div class="text-content"><span class="label">총 알림</span><span id="final-total-recommendations" class="value"></span></div></div>
+            </div>
+        </div>
+        
+        <!-- ★★★ 변경점 4번: 업적 표시 영역 추가 ★★★ -->
+        <div class="result-section">
+            <h3><i class="fa-solid fa-medal"></i> 달성 업적</h3>
+            <div id="achievements-list">
+                <!-- 자바스크립트로 채워질 공간 -->
+            </div>
+        </div>
+        
+        <!-- ★★★ 변경점 1번: 버튼 그룹 및 확인 버튼 추가 ★★★ -->
+        <div id="modal-buttons">
+            <button id="close-modal-button">확인</button>
+            <button id="restart-button">다시하기</button>
+        </div>
     </div>
 </div>
 
 <script>
-// --- 데이터 영역 ---
+// --- 데이터 영역 (기존과 동일) ---
 const mainTags=['판타지','무협','현대','로맨스','현대판타지','라이트노벨','고수위','공포','SF','스포츠','대체역사'];
-const subTags = [
-    '가상현실', '가챠', '갤러리', '게임', '게임판타지', '경영', '고수위', 
-    '괴이/괴담', '구원', '귀환', '나데나데', '남녀역전', '노맨스', '느린전개', 
-    '다크판타지', '던전', '동양판타지', '드라마', '로우판타지', '마법사', '마법소녀', 
-    '먼치킨', '모험', '미궁', '버튜버', '백합', '배우물', '복수', '빙의', 
-    '사이버펑크', '성장', '성장형먼치킨', '성좌물', '시스템', '순애', '스포츠', 
-    '아카데미', '아포칼립스', '악당', '어반판타지', '연예계', '역키잡', '이세계', 
-    '인외물', '인터넷방송', '일상', '전생', '집착', '천재', '초능력', 
-    '커뮤니티', '코미디', '탑등반', '하렘', '학원도시', '헌터', '현실적', 
-    '후회', '피폐', '환생', '회귀', '흑막', '힐링', 'NTR', 'SF', 'SM', 'TS'
-];
-const tagCompatibility = {
-    '판타지': {
-        '가상현실': 1.2,
-        '피폐': 1.2,
-        '가챠': 1.3,
-        '갤러리': 0.7,
-        '게임': 1.3,
-        '게임판타지': 1.5,
-        '경영': 1.2,
-        '고수위': 1.0,
-        '괴이/괴담': 1.1,
-        '구원': 1.2,
-        '귀환': 1.3,
-        '나데나데': 1.1,
-        '남녀역전': 1.0,
-        '노맨스': 1.0,
-        '느린전개': 1.3,
-        '다크판타지': 1.4,
-        '던전': 1.4,
-        '동양판타지': 1.2,
-        '드라마': 1.1,
-        '로우판타지': 1.4,
-        '마법사': 1.5,
-        '마법소녀': 1.2,
-        '먼치킨': 1.5,
-        '모험': 1.5,
-        '미궁': 1.3,
-        '버튜버': 0.6,
-        '백합': 1.0,
-        '배우물': 0.6,
-        '복수': 1.2,
-        '빙의': 1.4,
-        '사이버펑크': 0.7,
-        'SF': 0.8,
-        '성장': 1.4,
-        '성장형먼치킨': 1.5,
-        '성좌물': 1.3,
-        '시스템': 1.4,
-        '순애': 1.1,
-        '스포츠': 0.6,
-        '아카데미': 1.4,
-        '아포칼립스': 1.0,
-        '악당': 1.2,
-        '어반판타지': 1.1,
-        '연예계': 0.5,
-        '역키잡': 1.0,
-        '이세계': 1.5,
-        '인외물': 1.3,
-        '인터넷방송': 0.6,
-        '일상': 0.7,
-        '전생': 1.4,
-        '집착': 1.1,
-        '천재': 1.3,
-        '초능력': 1.2,
-        '커뮤니티': 0.6,
-        '코미디': 1.2,
-        '탑등반': 1.4,
-        '하렘': 1.2,
-        '학원도시': 1.1,
-        '헌터': 0.9,
-        '현실적': 0.6,
-        '후회': 1.1,
-        '환생': 1.4,
-        '회귀': 1.4,
-        '흑막': 1.3,
-        '힐링': 1.0,
-        'NTR': 0.8,
-        'SM': 0.9,
-        'TS': 1.1
-    },
-    '무협': {
-        '가상현실': 0.9,
-        '피폐': 1.3,
-        '가챠': 0.8,
-        '갤러리': 0.6,
-        '게임': 0.9,
-        '게임판타지': 0.9,
-        '경영': 1.2,
-        '고수위': 1.0,
-        '괴이/괴담': 1.1,
-        '구원': 1.2,
-        '귀환': 1.2,
-        '나데나데': 1.0,
-        '남녀역전': 0.9,
-        '노맨스': 1.1,
-        '느린전개': 1.2,
-        '다크판타지': 1.1,
-        '던전': 0.8,
-        '동양판타지': 1.5,
-        '드라마': 1.2,
-        '로우판타지': 1.1,
-        '마법사': 0.8,
-        '마법소녀': 0.6,
-        '먼치킨': 1.5,
-        '모험': 1.3,
-        '미궁': 1.0,
-        '버튜버': 0.5,
-        '백합': 0.9,
-        '배우물': 0.5,
-        '복수': 1.5,
-        '빙의': 1.4,
-        '사이버펑크': 0.5,
-        'SF': 0.6,
-        '성장': 1.4,
-        '성장형먼치킨': 1.4,
-        '성좌물': 0.8,
-        '시스템': 1.1,
-        '순애': 1.2,
-        '스포츠': 0.7,
-        '아카데미': 0.9,
-        '아포칼립스': 0.7,
-        '악당': 1.2,
-        '어반판타지': 0.7,
-        '연예계': 0.5,
-        '역키잡': 0.9,
-        '이세계': 0.9,
-        '인외물': 1.0,
-        '인터넷방송': 0.5,
-        '일상': 0.8,
-        '전생': 1.4,
-        '집착': 1.1,
-        '천재': 1.4,
-        '초능력': 0.8,
-        '커뮤니티': 0.6,
-        '코미디': 1.2,
-        '탑등반': 0.8,
-        '하렘': 1.0,
-        '학원도시': 0.7,
-        '헌터': 0.7,
-        '현실적': 0.9,
-        '후회': 1.2,
-        '환생': 1.3,
-        '회귀': 1.5,
-        '흑막': 1.3,
-        '힐링': 1.0,
-        'NTR': 0.7,
-        'SM': 0.8,
-        'TS': 0.8
-    },
-    '현대': {
-        '가상현실': 1.2,
-        '피폐': 1.3,
-        '가챠': 1.1,
-        '갤러리': 1.4,
-        '게임': 1.3,
-        '게임판타지': 0.7,
-        '경영': 1.4,
-        '고수위': 1.1,
-        '괴이/괴담': 1.2,
-        '구원': 1.3,
-        '귀환': 0.9,
-        '나데나데': 1.2,
-        '남녀역전': 1.1,
-        '노맨스': 1.1,
-        '느린전개': 1.2,
-        '다크판타지': 0.6,
-        '던전': 0.6,
-        '동양판타지': 0.5,
-        '드라마': 1.5,
-        '로우판타지': 0.8,
-        '마법사': 0.5,
-        '마법소녀': 0.6,
-        '먼치킨': 0.9,
-        '모험': 0.8,
-        '미궁': 0.7,
-        '버튜버': 1.4,
-        '백합': 1.2,
-        '배우물': 1.5,
-        '복수': 1.2,
-        '빙의': 0.8,
-        '사이버펑크': 1.1,
-        'SF': 0.9,
-        '성장': 1.3,
-        '성장형먼치킨': 0.9,
-        '성좌물': 0.7,
-        '시스템': 1.0,
-        '순애': 1.4,
-        '스포츠': 1.3,
-        '아카데미': 1.2,
-        '아포칼립스': 0.9,
-        '악당': 1.1,
-        '어반판타지': 1.0,
-        '연예계': 1.5,
-        '역키잡': 1.2,
-        '이세계': 0.6,
-        '인외물': 0.7,
-        '인터넷방송': 1.4,
-        '일상': 1.5,
-        '전생': 0.7,
-        '집착': 1.3,
-        '천재': 1.4,
-        '초능력': 1.0,
-        '커뮤니티': 1.4,
-        '코미디': 1.3,
-        '탑등반': 0.6,
-        '하렘': 0.9,
-        '학원도시': 1.1,
-        '헌터': 0.8,
-        '현실적': 1.5,
-        '후회': 1.3,
-        '환생': 0.7,
-        '회귀': 0.9,
-        '흑막': 1.1,
-        '힐링': 1.3,
-        'NTR': 1.0,
-        'SM': 1.0,
-        'TS': 1.4
-    },
-    '로맨스': {
-        '가상현실': 0.9,
-        '피폐': 1.4,
-        '가챠': 0.7,
-        '갤러리': 1.0,
-        '게임': 0.8,
-        '게임판타지': 0.8,
-        '경영': 1.0,
-        '고수위': 1.2,
-        '괴이/괴담': 0.8,
-        '구원': 1.5,
-        '귀환': 1.1,
-        '나데나데': 1.4,
-        '남녀역전': 1.2,
-        '노맨스': 0.5,
-        '느린전개': 1.3,
-        '다크판타지': 0.9,
-        '던전': 0.7,
-        '동양판타지': 1.0,
-        '드라마': 1.4,
-        '로우판타지': 1.0,
-        '마법사': 1.0,
-        '마법소녀': 1.1,
-        '먼치킨': 0.8,
-        '모험': 0.9,
-        '미궁': 0.8,
-        '버튜버': 1.1,
-        '백합': 1.3,
-        '배우물': 1.2,
-        '복수': 1.0,
-        '빙의': 1.3,
-        '사이버펑크': 0.8,
-        'SF': 0.8,
-        '성장': 1.1,
-        '성장형먼치킨': 0.8,
-        '성좌물': 0.8,
-        '시스템': 0.9,
-        '순애': 1.6,
-        '스포츠': 1.0,
-        '아카데미': 1.3,
-        '아포칼립스': 0.8,
-        '악당': 0.9,
-        '어반판타지': 1.0,
-        '연예계': 1.2,
-        '역키잡': 1.3,
-        '이세계': 1.0,
-        '인외물': 1.1,
-        '인터넷방송': 1.0,
-        '일상': 1.3,
-        '전생': 1.1,
-        '집착': 1.5,
-        '천재': 1.1,
-        '초능력': 1.0,
-        '커뮤니티': 1.0,
-        '코미디': 1.2,
-        '탑등반': 0.7,
-        '하렘': 0.6,
-        '학원도시': 1.2,
-        '헌터': 0.8,
-        '현실적': 1.2,
-        '후회': 1.4,
-        '환생': 1.2,
-        '회귀': 1.1,
-        '흑막': 1.0,
-        '힐링': 1.3,
-        'NTR': 0.6,
-        'SM': 1.1,
-        'TS': 1.0
-    },
-    '현대판타지': {
-        '가상현실': 1.3,
-        '피폐': 0.7,
-        '가챠': 1.3,
-        '갤러리': 1.2,
-        '게임': 1.4,
-        '게임판타지': 1.3,
-        '경영': 1.2,
-        '고수위': 1.0,
-        '괴이/괴담': 1.3,
-        '구원': 1.2,
-        '귀환': 1.4,
-        '나데나데': 1.0,
-        '남녀역전': 1.0,
-        '노맨스': 1.0,
-        '느린전개': 1.0,
-        '다크판타지': 1.2,
-        '던전': 1.6,
-        '동양판타지': 1.1,
-        '드라마': 1.1,
-        '로우판타지': 1.2,
-        '마법사': 1.2,
-        '마법소녀': 1.1,
-        '먼치킨': 1.6,
-        '모험': 1.3,
-        '미궁': 1.2,
-        '버튜버': 1.3,
-        '백합': 1.0,
-        '배우물': 0.9,
-        '복수': 1.3,
-        '빙의': 1.4,
-        '사이버펑크': 1.2,
-        'SF': 1.1,
-        '성장': 1.4,
-        '성장형먼치킨': 1.5,
-        '성좌물': 1.6,
-        '시스템': 1.6,
-        '순애': 1.0,
-        '스포츠': 1.1,
-        '아카데미': 1.3,
-        '아포칼립스': 1.4,
-        '악당': 1.2,
-        '어반판타지': 1.5,
-        '연예계': 1.0,
-        '역키잡': 1.0,
-        '이세계': 1.2,
-        '인외물': 1.2,
-        '인터넷방송': 1.4,
-        '일상': 0.9,
-        '전생': 1.2,
-        '집착': 1.1,
-        '천재': 1.3,
-        '초능력': 1.4,
-        '커뮤니티': 1.2,
-        '코미디': 1.2,
-        '탑등반': 1.6,
-        '하렘': 1.1,
-        '학원도시': 1.2,
-        '헌터': 1.7,
-        '현실적': 1.1,
-        '후회': 1.1,
-        '환생': 1.2,
-        '회귀': 1.5,
-        '흑막': 1.3,
-        '힐링': 0.9,
-        'NTR': 0.8,
-        'SM': 0.9,
-        'TS': 1.2
-    },
-    '라이트노벨': {
-        '가상현실': 1.3,
-        '피폐': 1.1,
-        '가챠': 1.3,
-        '갤러리': 1.0,
-        '게임': 1.3,
-        '게임판타지': 1.3,
-        '경영': 1.1,
-        '고수위': 1.1,
-        '괴이/괴담': 1.0,
-        '구원': 1.1,
-        '귀환': 1.2,
-        '나데나데': 1.3,
-        '남녀역전': 1.2,
-        '노맨스': 0.8,
-        '느린전개': 0.9,
-        '다크판타지': 1.0,
-        '던전': 1.2,
-        '동양판타지': 0.9,
-        '드라마': 1.0,
-        '로우판타지': 1.1,
-        '마법사': 1.3,
-        '마법소녀': 1.4,
-        '먼치킨': 1.4,
-        '모험': 1.3,
-        '미궁': 1.2,
-        '버튜버': 1.2,
-        '백합': 1.3,
-        '배우물': 0.8,
-        '복수': 1.0,
-        '빙의': 1.2,
-        '사이버펑크': 1.1,
-        'SF': 1.2,
-        '성장': 1.2,
-        '성장형먼치킨': 1.3,
-        '성좌물': 1.1,
-        '시스템': 1.3,
-        '순애': 1.2,
-        '스포츠': 1.1,
-        '아카데미': 1.5,
-        '아포칼립스': 1.0,
-        '악당': 1.1,
-        '어반판타지': 1.2,
-        '연예계': 1.0,
-        '역키잡': 1.2,
-        '이세계': 1.5,
-        '인외물': 1.3,
-        '인터넷방송': 1.1,
-        '일상': 1.2,
-        '전생': 1.3,
-        '집착': 1.1,
-        '천재': 1.2,
-        '초능력': 1.2,
-        '커뮤니티': 1.0,
-        '코미디': 1.4,
-        '탑등반': 1.1,
-        '하렘': 1.4,
-        '학원도시': 1.5,
-        '헌터': 1.0,
-        '현실적': 0.8,
-        '후회': 1.0,
-        '환생': 1.2,
-        '회귀': 1.1,
-        '흑막': 1.1,
-        '힐링': 1.1,
-        'NTR': 0.9,
-        'SM': 1.0,
-        'TS': 1.4
-    },
-    '고수위': {
-        '가상현실': 1.0,
-        '가챠': 0.9,
-        '피폐': 1.1,
-        '갤러리': 1.1,
-        '게임': 0.9,
-        '게임판타지': 0.9,
-        '경영': 0.8,
-        '고수위': 1.5,
-        '괴이/괴담': 1.2,
-        '구원': 1.1,
-        '귀환': 0.9,
-        '나데나데': 1.1,
-        '남녀역전': 1.3,
-        '노맨스': 0.6,
-        '느린전개': 1.0,
-        '다크판타지': 1.2,
-        '던전': 0.9,
-        '동양판타지': 1.0,
-        '드라마': 1.2,
-        '로우판타지': 1.0,
-        '마법사': 0.9,
-        '마법소녀': 1.0,
-        '먼치킨': 1.0,
-        '모험': 0.8,
-        '미궁': 1.1,
-        '버튜버': 1.1,
-        '백합': 1.2,
-        '배우물': 1.0,
-        '복수': 1.2,
-        '빙의': 1.1,
-        '사이버펑크': 1.0,
-        'SF': 0.9,
-        '성장': 0.8,
-        '성장형먼치킨': 0.9,
-        '성좌물': 0.9,
-        '시스템': 0.9,
-        '순애': 0.8,
-        '스포츠': 0.8,
-        '아카데미': 1.0,
-        '아포칼립스': 1.1,
-        '악당': 1.2,
-        '어반판타지': 1.1,
-        '연예계': 1.1,
-        '역키잡': 1.3,
-        '이세계': 1.0,
-        '인외물': 1.3,
-        '인터넷방송': 1.1,
-        '일상': 0.8,
-        '전생': 1.0,
-        '집착': 1.5,
-        '천재': 0.9,
-        '초능력': 1.0,
-        '커뮤니티': 1.1,
-        '코미디': 0.8,
-        '탑등반': 0.9,
-        '하렘': 1.4,
-        '학원도시': 1.0,
-        '헌터': 0.9,
-        '현실적': 1.1,
-        '후회': 1.3,
-        '환생': 1.0,
-        '회귀': 1.0,
-        '흑막': 1.1,
-        '힐링': 0.6,
-        'NTR': 1.6,
-        'SM': 1.6,
-        'TS': 1.2
-    },
-    '공포': {
-        '가상현실': 1.1,
-        '가챠': 0.7,
-        '피폐': 1.1,
-        '갤러리': 1.3,
-        '게임': 1.0,
-        '게임판타지': 0.8,
-        '경영': 0.6,
-        '고수위': 1.2,
-        '괴이/괴담': 1.6,
-        '구원': 1.1,
-        '귀환': 0.9,
-        '나데나데': 0.6,
-        '남녀역전': 0.8,
-        '노맨스': 1.1,
-        '느린전개': 1.3,
-        '다크판타지': 1.4,
-        '던전': 1.1,
-        '동양판타지': 1.1,
-        '드라마': 1.2,
-        '로우판타지': 1.2,
-        '마법사': 0.8,
-        '마법소녀': 0.7,
-        '먼치킨': 0.7,
-        '모험': 0.9,
-        '미궁': 1.4,
-        '버튜버': 0.9,
-        '백합': 0.8,
-        '배우물': 0.6,
-        '복수': 1.3,
-        '빙의': 1.2,
-        '사이버펑크': 1.1,
-        'SF': 1.1,
-        '성장': 0.8,
-        '성장형먼치킨': 0.7,
-        '성좌물': 1.0,
-        '시스템': 0.9,
-        '순애': 0.7,
-        '스포츠': 0.5,
-        '아카데미': 0.9,
-        '아포칼립스': 1.3,
-        '악당': 1.2,
-        '어반판타지': 1.3,
-        '연예계': 0.7,
-        '역키잡': 0.9,
-        '이세계': 1.0,
-        '인외물': 1.3,
-        '인터넷방송': 0.9,
-        '일상': 0.7,
-        '전생': 0.9,
-        '집착': 1.4,
-        '천재': 0.8,
-        '초능력': 1.2,
-        '커뮤니티': 1.2,
-        '코미디': 0.6,
-        '탑등반': 1.0,
-        '하렘': 0.7,
-        '학원도시': 0.9,
-        '헌터': 1.0,
-        '현실적': 1.3,
-        '후회': 1.3,
-        '환생': 0.9,
-        '회귀': 1.0,
-        '흑막': 1.3,
-        '힐링': 0.5,
-        'NTR': 1.1,
-        'SM': 1.1,
-        'TS': 0.8
-    },
-    'SF': {
-        '가상현실': 1.5,
-        '가챠': 1.0,
-        '피폐': 0.7,
-        '갤러리': 0.9,
-        '게임': 1.3,
-        '게임판타지': 1.2,
-        '경영': 1.1,
-        '고수위': 0.9,
-        '괴이/괴담': 1.0,
-        '구원': 1.1,
-        '귀환': 1.1,
-        '나데나데': 0.8,
-        '남녀역전': 1.0,
-        '노맨스': 1.3,
-        '느린전개': 1.1,
-        '다크판타지': 1.2,
-        '던전': 1.1,
-        '동양판타지': 0.6,
-        '드라마': 1.0,
-        '로우판타지': 0.9,
-        '마법사': 0.7,
-        '마법소녀': 0.8,
-        '먼치킨': 1.2,
-        '모험': 1.3,
-        '미궁': 1.1,
-        '버튜버': 0.9,
-        '백합': 0.9,
-        '배우물': 0.7,
-        '복수': 1.0,
-        '빙의': 1.0,
-        '사이버펑크': 1.6,
-        'SF': 1.6,
-        '성장': 1.1,
-        '성장형먼치킨': 1.1,
-        '성좌물': 1.3,
-        '시스템': 1.3,
-        '순애': 0.9,
-        '스포츠': 0.8,
-        '아카데미': 1.0,
-        '아포칼립스': 1.5,
-        '악당': 1.0,
-        '어반판타지': 1.1,
-        '연예계': 0.7,
-        '역키잡': 0.9,
-        '이세계': 1.4,
-        '인외물': 1.2,
-        '인터넷방송': 0.9,
-        '일상': 0.7,
-        '전생': 1.1,
-        '집착': 0.9,
-        '천재': 1.2,
-        '초능력': 1.2,
-        '커뮤니티': 0.9,
-        '코미디': 1.0,
-        '탑등반': 1.2,
-        '하렘': 0.9,
-        '학원도시': 1.0,
-        '헌터': 1.1,
-        '현실적': 1.2,
-        '후회': 0.9,
-        '환생': 1.0,
-        '회귀': 1.1,
-        '흑막': 1.1,
-        '힐링': 0.7,
-        'NTR': 0.8,
-        'SM': 0.9,
-        'TS': 1.1
-    },
-    '스포츠': {
-        '가상현실': 1.2,
-        '가챠': 0.9,
-        '갤러리': 1.1,
-        '피폐': 0.7,
-        '게임': 1.4,
-        '게임판타지': 1.0,
-        '경영': 1.2,
-        '고수위': 0.8,
-        '괴이/괴담': 0.6,
-        '구원': 1.1,
-        '귀환': 1.1,
-        '나데나데': 1.0,
-        '남녀역전': 0.9,
-        '노맨스': 1.0,
-        '느린전개': 1.1,
-        '다크판타지': 0.6,
-        '던전': 0.6,
-        '동양판타지': 0.7,
-        '드라마': 1.3,
-        '로우판타지': 0.7,
-        '마법사': 0.5,
-        '마법소녀': 0.5,
-        '먼치킨': 1.2,
-        '모험': 0.8,
-        '미궁': 0.6,
-        '버튜버': 1.1,
-        '백합': 0.9,
-        '배우물': 0.8,
-        '복수': 1.0,
-        '빙의': 1.2,
-        '사이버펑크': 0.7,
-        'SF': 0.8,
-        '성장': 1.4,
-        '성장형먼치킨': 1.3,
-        '성좌물': 0.7,
-        '시스템': 1.1,
-        '순애': 1.1,
-        '스포츠': 1.6,
-        '아카데미': 1.2,
-        '아포칼립스': 0.6,
-        '악당': 0.8,
-        '어반판타지': 0.8,
-        '연예계': 0.9,
-        '역키잡': 0.9,
-        '이세계': 0.7,
-        '인외물': 0.6,
-        '인터넷방송': 1.2,
-        '일상': 1.2,
-        '전생': 1.0,
-        '집착': 0.9,
-        '천재': 1.5,
-        '초능력': 0.9,
-        '커뮤니티': 1.1,
-        '코미디': 1.2,
-        '탑등반': 0.7,
-        '하렘': 0.8,
-        '학원도시': 1.1,
-        '헌터': 0.7,
-        '현실적': 1.4,
-        '후회': 1.1,
-        '환생': 0.9,
-        '회귀': 1.3,
-        '흑막': 0.9,
-        '힐링': 1.1,
-        'NTR': 0.7,
-        'SM': 0.7,
-        'TS': 0.8
-    },
-    '대체역사': {
-        '가상현실': 0.9,
-        '가챠': 0.8,
-        '피폐': 0.7,
-        '갤러리': 0.9,
-        '게임': 0.9,
-        '게임판타지': 0.8,
-        '경영': 1.3,
-        '고수위': 0.9,
-        '괴이/괴담': 0.9,
-        '구원': 1.1,
-        '귀환': 1.2,
-        '나데나데': 0.9,
-        '남녀역전': 1.0,
-        '노맨스': 1.0,
-        '느린전개': 1.2,
-        '다크판타지': 1.1,
-        '던전': 0.7,
-        '동양판타지': 1.2,
-        '드라마': 1.2,
-        '로우판타지': 1.2,
-        '마법사': 0.8,
-        '마법소녀': 0.6,
-        '먼치킨': 1.3,
-        '모험': 1.1,
-        '미궁': 0.8,
-        '버튜버': 0.6,
-        '백합': 0.9,
-        '배우물': 0.7,
-        '복수': 1.2,
-        '빙의': 1.5,
-        '사이버펑크': 0.7,
-        'SF': 0.8,
-        '성장': 1.3,
-        '성장형먼치킨': 1.2,
-        '성좌물': 0.7,
-        '시스템': 1.0,
-        '순애': 1.0,
-        '스포츠': 0.8,
-        '아카데미': 1.0,
-        '아포칼립스': 0.9,
-        '악당': 1.1,
-        '어반판타지': 0.8,
-        '연예계': 0.8,
-        '역키잡': 1.0,
-        '이세계': 0.9,
-        '인외물': 0.9,
-        '인터넷방송': 0.6,
-        '일상': 0.9,
-        '전생': 1.5,
-        '집착': 1.0,
-        '천재': 1.3,
-        '초능력': 0.9,
-        '커뮤니티': 0.8,
-        '코미디': 1.0,
-        '탑등반': 0.7,
-        '하렘': 0.9,
-        '학원도시': 0.7,
-        '헌터': 0.7,
-        '현실적': 1.3,
-        '후회': 1.2,
-        '환생': 1.4,
-        '회귀': 1.6,
-        '흑막': 1.2,
-        '힐링': 0.9,
-        'NTR': 0.8,
-        'SM': 0.8,
-        'TS': 0.9
-    }
-};
-const randomEvents = [ { name: "플랫폼 메인 노출", message: "노벨피아 메인 배너를 받아 신규 유입이 폭발합니다!", chance: .02, duration: 5, effect: { inflowMultiplier: 2.5, favoritesAbsoluteBonus: 1000, favoritesMultiplier: 1.2, latestViewsAbsoluteBonus: 500 } }, { name: "커뮤니티 입소문", message: "장붕이 중 한 명이 소설 바이럴을 발목 돌리듯 제대로 돌렸습니다!", chance: .07, duration: 10, effect: { inflowMultiplier: 1.8, retentionRate: 1.02, favoritesAbsoluteBonus: 300, favoritesMultiplier: 1.05 } }, { name: "악성 리뷰 테러", message: "익살꾸러기들이 당신의 소설에 살인스탭을 밟고 있습니다...", chance: .05, duration: 4, effect: { inflowMultiplier: .6, retentionRate: .95, favoritesPenaltyRate: .05, favoritesAbsolutePenalty: 70, latestViewsAbsolutePenalty: 50 } }, { name: "비처녀 논란", message: "소설에 비처녀가 나온다는 음해가 떠돌고야 말았습니다. 억울하지만, 해명할 수가 없습니다.", chance: .05, duration: 2, effect: { retentionRate: .9, favoritesPenaltyRate: .03, favoritesAbsolutePenalty: 50 } }, { name: "잘 적힌 리뷰", message: "훌륭한 필력의 독자 한 명이 극찬 리뷰를 작성했습니다! 뽀삐와 누렁이들이 군침을 흘립니다!!", chance: .02, duration: 7, effect: { inflowMultiplier: 3, favoriteRate: 1.5, favoritesAbsoluteBonus: 500, latestViewsAbsoluteBonus: 150, favoritesMultiplier: 1.05 } }, { name: "여캐 갈드컵 개최", message: "작품 속 여성 캐릭터들에 대한 정실 논쟁이 발발했습니다! 이게 바이럴이다!", chance: .03, duration: 5, effect: { inflowMultiplier: 2.2, favoriteRate: 1.2, favoritesAbsoluteBonus: 180, favoritesMultiplier: 1.05 } }, { name: "금손 독자의 팬아트", message: "한 '금손' 독자가 그린 팬아트가 커뮤니티에서 화제가 되어 신규 독자들이 유입됩니다.", chance: .06, duration: 4, effect: { inflowMultiplier: 1.5, retentionRate: 1.01, favoritesAbsoluteBonus: 120, favoritesMultiplier: 1.05 } }, { name: "장르 프로모션 선정", message: "노벨피아의 PD픽에 당신의 작품이 선정되었습니다!", chance: .04, duration: 10, effect: { inflowMultiplier: 2, favoritesAbsoluteBonus: 140, favoritesMultiplier: 1.2, latestViewsAbsoluteBonus: 300 } }, { name: "표절 논란", message: "표절 논란에 휩싸였습니다! 삐이사아앙! 독자들이 등을 돌리기 시작합니다.", chance: .01, duration: 7, effect: { inflowMultiplier: .4, retentionRate: .9, favoritesPenaltyRate: .2, favoritesAbsolutePenalty: 200, favoritesMultiplier: 0.8 } }, { name: "경쟁작 등장", message: "초대형 트럭 기대작이 연재를 시작했습니다. 독자들의 관심이 분산됩니다.", chance: .02, duration: 10, effect: { inflowMultiplier: .75 } }, { name: "떡볶이 주르륵", message: "서버에 떡볶이가 엎어져서 독자들이 접근에 불편을 겪고 있습니다.", chance: .03, duration: 2, effect: { inflowMultiplier: .7 } }, { name: "캐릭터 붕괴 논란", message: "최근 전개에서 캐릭터의 성격이 이전과 다르다는 비판이 제기되고 있습니다.", chance: .05, duration: 3, effect: { retentionRate: .96, favoriteRate: .8, favoritesAbsolutePenalty: 20, latestViewsAbsolutePenalty: 100, favoritesMultiplier: 0.9 } }, { name: "주화입마", message: "글이 잘 써지지 않아 작품의 전개가 잠시 흔들리는 것 같습니다...", chance: .05, duration: 5, effect: { retentionRate: .95 } }, { name: "소소한 유행어", message: "작품 속 대사 하나가 독자들 사이에서 밈이 되었습니다. 댓글창이 활발해집니다.", chance: .10, duration: 4, effect: { favoriteRate: 1.05, favoritesAbsoluteBonus: 15 } }, { name: "연참의 유혹", message: "오늘따라 글이 술술 써집니다! 고봉밥에 누렁이들이 기뻐합니다.", chance: .08, duration: 2, effect: { retentionRate: 1.01, favoritesAbsoluteBonus: 20 } }, { name: "선작 인증글", message: "한 독자가 커뮤니티에 '이거 재밌다'며 벽갤질을 시작했습니다. 몇몇 독자들이 관심을 보입니다.", chance: .12, duration: 3, effect: { inflowMultiplier: 1.1, favoritesAbsoluteBonus: 30 } }, { name: "사소한 설정오류 지적", message: "한 꼼꼼한 독자가 이전 화의 사소한 설정 오류를 지적했습니다. 일부 독자들이 혼란스러워합니다.", chance: .15, duration: 2, effect: { retentionRate: .99, favoritesAbsolutePenalty: 10 } }, { name: "건강 염려", message: "독자들이 작가의 건강을 걱정하고 있습니다. 마음이 따뜻해집니다.", chance: .10, duration: 1, effect: { favoritesAbsoluteBonus: 10 } }, { name: "경쟁작 휴재", message: "비슷한 장르의 경쟁작이 잠시 휴재에 들어갔습니다. 반사 이익을 얻을지도 모릅니다.", chance: .09, duration: 3, effect: { inflowMultiplier: 1.15 } }, { name: "지각...!", message: "예상치 못한 사정으로 업로드 시간이 조금 늦었습니다. 독자들이 애타게 기다립니다.", chance: .13, duration: 1, effect: { retentionRate: .98, latestViewsAbsolutePenalty: 20 } }, { name: "인상적인 조연", message: "주인공이 아닌 조연 캐릭터가 예상 밖의 인기를 끌고 있습니다.", chance: .10, duration: 5, effect: { favoriteRate: 1.03, favoritesAbsoluteBonus: 25, retentionRate: 1.005 } }, { name: "플랫폼 점검", message: "플랫폼 정기 점검 시간과 연재 시간이 겹쳤습니다. 일부 독자들이 접근에 실패했습니다.", chance: .11, duration: 1, effect: { inflowMultiplier: 0.9 } }, { name: "오타 지적 댓글", message: "친절한 독자들이 댓글로 오타를 교정해주고 있습니다. 작품의 완성도가 올라갑니다...만 조금 부끄럽습니다.", chance: .15, duration: 2, effect: { retentionRate: 1.002, favoritesAbsolutePenalty: 5 } }, { name: "고래 독자 등장", message: "한 '대주주' 독자가 커다란 후원을 보냈습니다! 작가의 창작 의욕이 불타오릅니다!", chance: .07, duration: 3, effect: { favoritesAbsoluteBonus: 100, favoriteRate: 1.1, retentionRate: 1.005 } }, { name: "스포일러 테러", message: "한 악질 독자가 1화 댓글에 미래 전개 스포일러를 남겼습니다! 일부 독자들이 김이 빠졌습니다.", chance: .08, duration: 2, effect: { retentionRate: 0.97, favoritesAbsolutePenalty: 30 } }, { name: "독자의 심층 분석", message: "한 독자가 소설의 떡밥과 설정을 정리한 분석글을 올렸습니다. 독자들의 이해도가 깊어집니다.", chance: .09, duration: 4, effect: { retentionRate: 1.015, favoritesAbsoluteBonus: 40 } }, { name: "의도치 않은 논쟁", message: "의도와 다르게, 한 장면이 독자들 사이에서 뜨거운 논쟁을 일으켰습니다. 댓글창이 불타지만, 어쨌든 관심은 늘었습니다.", chance: .11, duration: 3, effect: { inflowMultiplier: 1.05, retentionRate: 0.99 } }, { name: "작가의 건강 악화", message: "작가가 건강상의 이유로 짧은 지각을 예고했습니다. 독자들이 걱정과 응원을 보냅니다.", chance: .06, duration: 2, effect: { retentionRate: 0.98, favoritesAbsoluteBonus: 50 } }, { name: "현자타임", message: "엄청난 카타르시스를 느낀 독자들이 '현자타임'에 빠졌습니다. 잠시 소설에서 벗어나려는 독자들이 생깁니다.", chance: .10, duration: 3, effect: { retentionRate: 0.985, inflowMultiplier: 0.95 } }, { name: "하꼬 스트리머 언급", message: "한 하꼬 스트리머가 방송에서 당신의 소설을 추천했습니다! 소규모 신규 유입이 발생합니다.", chance: .05, duration: 4, effect: { inflowMultiplier: 1.3, favoritesAbsoluteBonus: 80 } }, { name: "뜨끈한 국밥", message: "이번 화는 특별할 건 없지만, 속이 든든해지는 '국밥' 같은 전개였습니다. 독자들이 편안함을 느낍니다.", chance: .12, duration: 2, effect: { retentionRate: 1.01, favoriteRate: 1.05 } }, { name: "댓글창 오류", message: "플랫폼 오류로 댓글 작성이 막혔습니다. 소통이 단절되어 독자들이 답답해합니다.", chance: .10, duration: 1, effect: { favoriteRate: 0.9, retentionRate: 0.995 } }, { name: "조연 주식 떡상", message: "생각지도 못한 조연의 주가가 폭등했습니다! 해당 캐릭터의 팬들이 결집하기 시작합니다.", chance: .09, duration: 5, effect: { favoritesAbsoluteBonus: 50, favoriteRate: 1.08, recommendationBonus: 2 } }, { name: "스트레스로 인한 급완결", message: "작품 세계에 운석을 떨어트리고 싶어졌습니다! 모든 것이 무로 돌아가며 이야기는 갑작스럽게 끝을 맺습니다...", chance: .001, duration: 1, effect: { isGameEnding: true }, endReason: "급완결" }, { name: "주화입마로 인한 연재 중단", message: "어느 날 갑자기 작가가 잠적했습니다. 독자들의 기다림 속에서 소설은 미완으로 남게 됩니다.", chance: .003, duration: 1, effect: { isGameEnding: true }, endReason: "작가 잠적으로 인한 연재 중단" }, { name: "해외 출판사 계약", message: "작품의 가능성을 본 해외 대형 출판사에서 거액의 계약을 제안했습니다! 작가는 모든 것을 정리하고 해외로 떠납니다...", chance: .001, duration: 1, effect: { isGameEnding: true }, endReason: "해외 진출로 인한 조기 완결" } ];
+const subTags = ['가상현실', '가챠', '갤러리', '게임', '게임판타지', '경영', '고수위', '괴이/괴담', '구원', '귀환', '나데나데', '남녀역전', '노맨스', '느린전개', '다크판타지', '던전', '동양판타지', '드라마', '로우판타지', '마법사', '마법소녀', '먼치킨', '모험', '미궁', '버튜버', '백합', '배우물', '복수', '빙의', '사이버펑크', '성장', '성장형먼치킨', '성좌물', '시스템', '순애', '스포츠', '아카데미', '아포칼립스', '악당', '어반판타지', '연예계', '역키잡', '이세계', '인외물', '인터넷방송', '일상', '전생', '집착', '천재', '초능력', '커뮤니티', '코미디', '탑등반', '하렘', '학원도시', '헌터', '현실적', '후회', '피폐', '환생', '회귀', '흑막', '힐링', 'NTR', 'SF', 'SM', 'TS'];
+const tagCompatibility = { '판타지': {'가상현실': 1.2, '피폐': 1.2, '가챠': 1.3, '갤러리': 0.7, '게임': 1.3, '게임판타지': 1.5, '경영': 1.2, '고수위': 1.0, '괴이/괴담': 1.1, '구원': 1.2, '귀환': 1.3, '나데나데': 1.1, '남녀역전': 1.0, '노맨스': 1.0, '느린전개': 1.3, '다크판타지': 1.4, '던전': 1.4, '동양판타지': 1.2, '드라마': 1.1, '로우판타지': 1.4, '마법사': 1.5, '마법소녀': 1.2, '먼치킨': 1.5, '모험': 1.5, '미궁': 1.3, '버튜버': 0.6, '백합': 1.0, '배우물': 0.6, '복수': 1.2, '빙의': 1.4, '사이버펑크': 0.7, 'SF': 0.8, '성장': 1.4, '성장형먼치킨': 1.5, '성좌물': 1.3, '시스템': 1.4, '순애': 1.1, '스포츠': 0.6, '아카데미': 1.4, '아포칼립스': 1.0, '악당': 1.2, '어반판타지': 1.1, '연예계': 0.5, '역키잡': 1.0, '이세계': 1.5, '인외물': 1.3, '인터넷방송': 0.6, '일상': 0.7, '전생': 1.4, '집착': 1.1, '천재': 1.3, '초능력': 1.2, '커뮤니티': 0.6, '코미디': 1.2, '탑등반': 1.4, '하렘': 1.2, '학원도시': 1.1, '헌터': 0.9, '현실적': 0.6, '후회': 1.1, '환생': 1.4, '회귀': 1.4, '흑막': 1.3, '힐링': 1.0, 'NTR': 0.8, 'SM': 0.9, 'TS': 1.1}, '무협': {'가상현실': 0.9, '피폐': 1.3, '가챠': 0.8, '갤러리': 0.6, '게임': 0.9, '게임판타지': 0.9, '경영': 1.2, '고수위': 1.0, '괴이/괴담': 1.1, '구원': 1.2, '귀환': 1.2, '나데나데': 1.0, '남녀역전': 0.9, '노맨스': 1.1, '느린전개': 1.2, '다크판타지': 1.1, '던전': 0.8, '동양판타지': 1.5, '드라마': 1.2, '로우판타지': 1.1, '마법사': 0.8, '마법소녀': 0.6, '먼치킨': 1.5, '모험': 1.3, '미궁': 1.0, '버튜버': 0.5, '백합': 0.9, '배우물': 0.5, '복수': 1.5, '빙의': 1.4, '사이버펑크': 0.5, 'SF': 0.6, '성장': 1.4, '성장형먼치킨': 1.4, '성좌물': 0.8, '시스템': 1.1, '순애': 1.2, '스포츠': 0.7, '아카데미': 0.9, '아포칼립스': 0.7, '악당': 1.2, '어반판타지': 0.7, '연예계': 0.5, '역키잡': 0.9, '이세계': 0.9, '인외물': 1.0, '인터넷방송': 0.5, '일상': 0.8, '전생': 1.4, '집착': 1.1, '천재': 1.4, '초능력': 0.8, '커뮤니티': 0.6, '코미디': 1.2, '탑등반': 0.8, '하렘': 1.0, '학원도시': 0.7, '헌터': 0.7, '현실적': 0.9, '후회': 1.2, '환생': 1.3, '회귀': 1.5, '흑막': 1.3, '힐링': 1.0, 'NTR': 0.7, 'SM': 0.8, 'TS': 0.8}, '현대': {'가상현실': 1.2, '피폐': 1.3, '가챠': 1.1, '갤러리': 1.4, '게임': 1.3, '게임판타지': 0.7, '경영': 1.4, '고수위': 1.1, '괴이/괴담': 1.2, '구원': 1.3, '귀환': 0.9, '나데나데': 1.2, '남녀역전': 1.1, '노맨스': 1.1, '느린전개': 1.2, '다크판타지': 0.6, '던전': 0.6, '동양판타지': 0.5, '드라마': 1.5, '로우판타지': 0.8, '마법사': 0.5, '마법소녀': 0.6, '먼치킨': 0.9, '모험': 0.8, '미궁': 0.7, '버튜버': 1.4, '백합': 1.2, '배우물': 1.5, '복수': 1.2, '빙의': 0.8, '사이버펑크': 1.1, 'SF': 0.9, '성장': 1.3, '성장형먼치킨': 0.9, '성좌물': 0.7, '시스템': 1.0, '순애': 1.4, '스포츠': 1.3, '아카데미': 1.2, '아포칼립스': 0.9, '악당': 1.1, '어반판타지': 1.0, '연예계': 1.5, '역키잡': 1.2, '이세계': 0.6, '인외물': 0.7, '인터넷방송': 1.4, '일상': 1.5, '전생': 0.7, '집착': 1.3, '천재': 1.4, '초능력': 1.0, '커뮤니티': 1.4, '코미디': 1.3, '탑등반': 0.6, '하렘': 0.9, '학원도시': 1.1, '헌터': 0.8, '현실적': 1.5, '후회': 1.3, '환생': 0.7, '회귀': 0.9, '흑막': 1.1, '힐링': 1.3, 'NTR': 1.0, 'SM': 1.0, 'TS': 1.4}, '로맨스': {'가상현실': 0.9, '피폐': 1.4, '가챠': 0.7, '갤러리': 1.0, '게임': 0.8, '게임판타지': 0.8, '경영': 1.0, '고수위': 1.2, '괴이/괴담': 0.8, '구원': 1.5, '귀환': 1.1, '나데나데': 1.4, '남녀역전': 1.2, '노맨스': 0.5, '느린전개': 1.3, '다크판타지': 0.9, '던전': 0.7, '동양판타지': 1.0, '드라마': 1.4, '로우판타지': 1.0, '마법사': 1.0, '마법소녀': 1.1, '먼치킨': 0.8, '모험': 0.9, '미궁': 0.8, '버튜버': 1.1, '백합': 1.3, '배우물': 1.2, '복수': 1.0, '빙의': 1.3, '사이버펑크': 0.8, 'SF': 0.8, '성장': 1.1, '성장형먼치킨': 0.8, '성좌물': 0.8, '시스템': 0.9, '순애': 1.6, '스포츠': 1.0, '아카데미': 1.3, '아포칼립스': 0.8, '악당': 0.9, '어반판타지': 1.0, '연예계': 1.2, '역키잡': 1.3, '이세계': 1.0, '인외물': 1.1, '인터넷방송': 1.0, '일상': 1.3, '전생': 1.1, '집착': 1.5, '천재': 1.1, '초능력': 1.0, '커뮤니티': 1.0, '코미디': 1.2, '탑등반': 0.7, '하렘': 0.6, '학원도시': 1.2, '헌터': 0.8, '현실적': 1.2, '후회': 1.4, '환생': 1.2, '회귀': 1.1, '흑막': 1.0, '힐링': 1.3, 'NTR': 0.6, 'SM': 1.1, 'TS': 1.0},'현대판타지': {'가상현실': 1.3, '피폐': 0.7, '가챠': 1.3, '갤러리': 1.2, '게임': 1.4, '게임판타지': 1.3, '경영': 1.2, '고수위': 1.0, '괴이/괴담': 1.3, '구원': 1.2, '귀환': 1.4, '나데나데': 1.0, '남녀역전': 1.0, '노맨스': 1.0, '느린전개': 1.0, '다크판타지': 1.2, '던전': 1.6, '동양판타지': 1.1, '드라마': 1.1, '로우판타지': 1.2, '마법사': 1.2, '마법소녀': 1.1, '먼치킨': 1.6, '모험': 1.3, '미궁': 1.2, '버튜버': 1.3, '백합': 1.0, '배우물': 0.9, '복수': 1.3, '빙의': 1.4, '사이버펑크': 1.2, 'SF': 1.1, '성장': 1.4, '성장형먼치킨': 1.5, '성좌물': 1.6, '시스템': 1.6, '순애': 1.0, '스포츠': 1.1, '아카데미': 1.3, '아포칼립스': 1.4, '악당': 1.2, '어반판타지': 1.5, '연예계': 1.0, '역키잡': 1.0, '이세계': 1.2, '인외물': 1.2, '인터넷방송': 1.4, '일상': 0.9, '전생': 1.2, '집착': 1.1, '천재': 1.3, '초능력': 1.4, '커뮤니티': 1.2, '코미디': 1.2, '탑등반': 1.6, '하렘': 1.1, '학원도시': 1.2, '헌터': 1.7, '현실적': 1.1, '후회': 1.1, '환생': 1.2, '회귀': 1.5, '흑막': 1.3, '힐링': 0.9, 'NTR': 0.8, 'SM': 0.9, 'TS': 1.2}, '라이트노벨': {'가상현실': 1.3, '피폐': 1.1, '가챠': 1.3, '갤러리': 1.0, '게임': 1.3, '게임판타지': 1.3, '경영': 1.1, '고수위': 1.1, '괴이/괴담': 1.0, '구원': 1.1, '귀환': 1.2, '나데나데': 1.3, '남녀역전': 1.2, '노맨스': 0.8, '느린전개': 0.9, '다크판타지': 1.0, '던전': 1.2, '동양판타지': 0.9, '드라마': 1.0, '로우판타지': 1.1, '마법사': 1.3, '마법소녀': 1.4, '먼치킨': 1.4, '모험': 1.3, '미궁': 1.2, '버튜버': 1.2, '백합': 1.3, '배우물': 0.8, '복수': 1.0, '빙의': 1.2, '사이버펑크': 1.1, 'SF': 1.2, '성장': 1.2, '성장형먼치킨': 1.3, '성좌물': 1.1, '시스템': 1.3, '순애': 1.2, '스포츠': 1.1, '아카데미': 1.5, '아포칼립스': 1.0, '악당': 1.1, '어반판타지': 1.2, '연예계': 1.0, '역키잡': 1.2, '이세계': 1.5, '인외물': 1.3, '인터넷방송': 1.1, '일상': 1.2, '전생': 1.3, '집착': 1.1, '천재': 1.2, '초능력': 1.2, '커뮤니티': 1.0, '코미디': 1.4, '탑등반': 1.1, '하렘': 1.4, '학원도시': 1.5, '헌터': 1.0, '현실적': 0.8, '후회': 1.0, '환생': 1.2, '회귀': 1.1, '흑막': 1.1, '힐링': 1.1, 'NTR': 0.9, 'SM': 1.0, 'TS': 1.4}, '고수위': {'가상현실': 1.0, '가챠': 0.9, '피폐': 1.1, '갤러리': 1.1, '게임': 0.9, '게임판타지': 0.9, '경영': 0.8, '고수위': 1.5, '괴이/괴담': 1.2, '구원': 1.1, '귀환': 0.9, '나데나데': 1.1, '남녀역전': 1.3, '노맨스': 0.6, '느린전개': 1.0, '다크판타지': 1.2, '던전': 0.9, '동양판타지': 1.0, '드라마': 1.2, '로우판타지': 1.0, '마법사': 0.9, '마법소녀': 1.0, '먼치킨': 1.0, '모험': 0.8, '미궁': 1.1, '버튜버': 1.1, '백합': 1.2, '배우물': 1.0, '복수': 1.2, '빙의': 1.1, '사이버펑크': 1.0, 'SF': 0.9, '성장': 0.8, '성장형먼치킨': 0.9, '성좌물': 0.9, '시스템': 0.9, '순애': 0.8, '스포츠': 0.8, '아카데미': 1.0, '아포칼립스': 1.1, '악당': 1.2, '어반판타지': 1.1, '연예계': 1.1, '역키잡': 1.3, '이세계': 1.0, '인외물': 1.3, '인터넷방송': 1.1, '일상': 0.8, '전생': 1.0, '집착': 1.5, '천재': 0.9, '초능력': 1.0, '커뮤니티': 1.1, '코미디': 0.8, '탑등반': 0.9, '하렘': 1.4, '학원도시': 1.0, '헌터': 0.9, '현실적': 1.1, '후회': 1.3, '환생': 1.0, '회귀': 1.0, '흑막': 1.1, '힐링': 0.6, 'NTR': 1.6, 'SM': 1.6, 'TS': 1.2}, '공포': {'가상현실': 1.1, '가챠': 0.7, '피폐': 1.1, '갤러리': 1.3, '게임': 1.0, '게임판타지': 0.8, '경영': 0.6, '고수위': 1.2, '괴이/괴담': 1.6, '구원': 1.1, '귀환': 0.9, '나데나데': 0.6, '남녀역전': 0.8, '노맨스': 1.1, '느린전개': 1.3, '다크판타지': 1.4, '던전': 1.1, '동양판타지': 1.1, '드라마': 1.2, '로우판타지': 1.2, '마법사': 0.8, '마법소녀': 0.7, '먼치킨': 0.7, '모험': 0.9, '미궁': 1.4, '버튜버': 0.9, '백합': 0.8, '배우물': 0.6, '복수': 1.3, '빙의': 1.2, '사이버펑크': 1.1, 'SF': 1.1, '성장': 0.8, '성장형먼치킨': 0.7, '성좌물': 1.0, '시스템': 0.9, '순애': 0.7, '스포츠': 0.5, '아카데미': 0.9, '아포칼립스': 1.3, '악당': 1.2, '어반판타지': 1.3, '연예계': 0.7, '역키잡': 0.9, '이세계': 1.0, '인외물': 1.3, '인터넷방송': 0.9, '일상': 0.7, '전생': 0.9, '집착': 1.4, '천재': 0.8, '초능력': 1.2, '커뮤니티': 1.2, '코미디': 0.6, '탑등반': 1.0, '하렘': 0.7, '학원도시': 0.9, '헌터': 1.0, '현실적': 1.3, '후회': 1.3, '환생': 0.9, '회귀': 1.0, '흑막': 1.3, '힐링': 0.5, 'NTR': 1.1, 'SM': 1.1, 'TS': 0.8}, 'SF': {'가상현실': 1.5, '가챠': 1.0, '피폐': 0.7, '갤러리': 0.9, '게임': 1.3, '게임판타지': 1.2, '경영': 1.1, '고수위': 0.9, '괴이/괴담': 1.0, '구원': 1.1, '귀환': 1.1, '나데나데': 0.8, '남녀역전': 1.0, '노맨스': 1.3, '느린전개': 1.1, '다크판타지': 1.2, '던전': 1.1, '동양판타지': 0.6, '드라마': 1.0, '로우판타지': 0.9, '마법사': 0.7, '마법소녀': 0.8, '먼치킨': 1.2, '모험': 1.3, '미궁': 1.1, '버튜버': 0.9, '백합': 0.9, '배우물': 0.7, '복수': 1.0, '빙의': 1.0, '사이버펑크': 1.6, 'SF': 1.6, '성장': 1.1, '성장형먼치킨': 1.1, '성좌물': 1.3, '시스템': 1.3, '순애': 0.9, '스포츠': 0.8, '아카데미': 1.0, '아포칼립스': 1.5, '악당': 1.0, '어반판타지': 1.1, '연예계': 0.7, '역키잡': 0.9, '이세계': 1.4, '인외물': 1.2, '인터넷방송': 0.9, '일상': 0.7, '전생': 1.1, '집착': 0.9, '천재': 1.2, '초능력': 1.2, '커뮤니티': 0.9, '코미디': 1.0, '탑등반': 1.2, '하렘': 0.9, '학원도시': 1.0, '헌터': 1.1, '현실적': 1.2, '후회': 0.9, '환생': 1.0, '회귀': 1.1, '흑막': 1.1, '힐링': 0.7, 'NTR': 0.8, 'SM': 0.9, 'TS': 1.1}, '스포츠': {'가상현실': 1.2, '가챠': 0.9, '갤러리': 1.1, '피폐': 0.7, '게임': 1.4, '게임판타지': 1.0, '경영': 1.2, '고수위': 0.8, '괴이/괴담': 0.6, '구원': 1.1, '귀환': 1.1, '나데나데': 1.0, '남녀역전': 0.9, '노맨스': 1.0, '느린전개': 1.1, '다크판타지': 0.6, '던전': 0.6, '동양판타지': 0.7, '드라마': 1.3, '로우판타지': 0.7, '마법사': 0.5, '마법소녀': 0.5, '먼치킨': 1.2, '모험': 0.8, '미궁': 0.6, '버튜버': 1.1, '백합': 0.9, '배우물': 0.8, '복수': 1.0, '빙의': 1.2, '사이버펑크': 0.7, 'SF': 0.8, '성장': 1.4, '성장형먼치킨': 1.3, '성좌물': 0.7, '시스템': 1.1, '순애': 1.1, '스포츠': 1.6, '아카데미': 1.2, '아포칼립스': 0.6, '악당': 0.8, '어반판타지': 0.8, '연예계': 0.9, '역키잡': 0.9, '이세계': 0.7, '인외물': 0.6, '인터넷방송': 1.2, '일상': 1.2, '전생': 1.0, '집착': 0.9, '천재': 1.5, '초능력': 0.9, '커뮤니티': 1.1, '코미디': 1.2, '탑등반': 0.7, '하렘': 0.8, '학원도시': 1.1, '헌터': 0.7, '현실적': 1.4, '후회': 1.1, '환생': 0.9, '회귀': 1.3, '흑막': 0.9, '힐링': 1.1, 'NTR': 0.7, 'SM': 0.7, 'TS': 0.8}, '대체역사': {'가상현실': 0.9, '가챠': 0.8, '피폐': 0.7, '갤러리': 0.9, '게임': 0.9, '게임판타지': 0.8, '경영': 1.3, '고수위': 0.9, '괴이/괴담': 0.9, '구원': 1.1, '귀환': 1.2, '나데나데': 0.9, '남녀역전': 1.0, '노맨스': 1.0, '느린전개': 1.2, '다크판타지': 1.1, '던전': 0.7, '동양판타지': 1.2, '드라마': 1.2, '로우판타지': 1.2, '마법사': 0.8, '마법소녀': 0.6, '먼치킨': 1.3, '모험': 1.1, '미궁': 0.8, '버튜버': 0.6, '백합': 0.9, '배우물': 0.7, '복수': 1.2, '빙의': 1.5, '사이버펑크': 0.7, 'SF': 0.8, '성장': 1.3, '성장형먼치킨': 1.2, '성좌물': 0.7, '시스템': 1.0, '순애': 1.0, '스포츠': 0.8, '아카데미': 1.0, '아포칼립스': 0.9, '악당': 1.1, '어반판타지': 0.8, '연예계': 0.8, '역키잡': 1.0, '이세계': 0.9, '인외물': 0.9, '인터넷방송': 0.6, '일상': 0.9, '전생': 1.5, '집착': 1.0, '천재': 1.3, '초능력': 0.9, '커뮤니티': 0.8, '코미디': 1.0, '탑등반': 0.7, '하렘': 0.9, '학원도시': 0.7, '헌터': 0.7, '현실적': 1.3, '후회': 1.2, '환생': 1.4, '회귀': 1.6, '흑막': 1.2, '힐링': 0.9, 'NTR': 0.8, 'SM': 0.8, 'TS': 0.9}};
+const randomEvents = [ { name: "플랫폼 메인 노출", message: "노벨피아 메인 배너를 받아 신규 유입이 폭발합니다!", chance: .02, duration: 5, effect: { inflowMultiplier: 2.5, favoritesAbsoluteBonus: 1000, favoritesMultiplier: 1.2, latestViewsAbsoluteBonus: 500 } }, { name: "커뮤니티 입소문", message: "장붕이 중 한 명이 소설 바이럴을 발목 돌리듯 제대로 돌렸습니다!", chance: .07, duration: 10, effect: { inflowMultiplier: 1.8, retentionRate: 1.02, favoritesAbsoluteBonus: 300, favoritesMultiplier: 1.05 } }, { name: "악성 리뷰 테러", message: "익살꾸러기들이 당신의 소설에 살인스탭을 밟고 있습니다...", chance: .05, duration: 4, effect: { inflowMultiplier: .6, retentionRate: .95, favoritesPenaltyRate: .05, favoritesAbsolutePenalty: 70, latestViewsAbsolutePenalty: 50 } }, { name: "비처녀 논란", message: "소설에 비처녀가 나온다는 음해가 떠돌고야 말았습니다. 억울하지만, 해명할 수가 없습니다.", chance: .05, duration: 2, effect: { retentionRate: .9, favoritesPenaltyRate: .03, favoritesAbsolutePenalty: 50 } }, { name: "잘 적힌 리뷰", message: "훌륭한 필력의 독자 한 명이 극찬 리뷰를 작성했습니다! 뽀삐와 누렁이들이 군침을 흘립니다!!", chance: .02, duration: 7, effect: { inflowMultiplier: 3, favoriteRate: 1.5, favoritesAbsoluteBonus: 500, latestViewsAbsoluteBonus: 150, favoritesMultiplier: 1.05 } }, { name: "여캐 갈드컵 개최", message: "작품 속 여성 캐릭터들에 대한 정실 논쟁이 발발했습니다! 이게 바이럴이다!", chance: .03, duration: 5, effect: { inflowMultiplier: 2.2, favoriteRate: 1.2, favoritesAbsoluteBonus: 180, favoritesMultiplier: 1.05 } }, { name: "금손 독자의 팬아트", message: "한 '금손' 독자가 그린 팬아트가 커뮤니티에서 화제가 되어 신규 독자들이 유입됩니다.", chance: .06, duration: 4, effect: { inflowMultiplier: 1.5, retentionRate: 1.01, favoritesAbsoluteBonus: 120, favoritesMultiplier: 1.05 } }, { name: "장르 프로모션 선정", message: "노벨피아의 PD픽에 당신의 작품이 선정되었습니다!", chance: .04, duration: 10, effect: { inflowMultiplier: 2, favoritesAbsoluteBonus: 140, favoritesMultiplier: 1.2, latestViewsAbsoluteBonus: 300 } }, { name: "표절 논란", message: "표절 논란에 휩싸였습니다! 삐이사아앙! 독자들이 등을 돌리기 시작합니다.", chance: .01, duration: 7, effect: { inflowMultiplier: .4, retentionRate: .9, favoritesPenaltyRate: .2, favoritesAbsolutePenalty: 200, favoritesMultiplier: 0.8 } }, { name: "경쟁작 등장", message: "초대형 트럭 기대작이 연재를 시작했습니다. 독자들의 관심이 분산됩니다.", chance: .02, duration: 10, effect: { inflowMultiplier: .75 } }, { name: "떡볶이 주르륵", message: "서버에 떡볶이가 엎어져서 독자들이 접근에 불편을 겪고 있습니다.", chance: .03, duration: 2, effect: { inflowMultiplier: .7 } }, { name: "캐릭터 붕괴 논란", message: "최근 전개에서 캐릭터의 성격이 이전과 다르다는 비판이 제기되고 있습니다.", chance: .05, duration: 3, effect: { retentionRate: .96, favoriteRate: .8, favoritesAbsolutePenalty: 20, latestViewsAbsolutePenalty: 100, favoritesMultiplier: 0.9 } }, { name: "주화입마", message: "글이 잘 써지지 않아 작품의 전개가 잠시 흔들리는 것 같습니다...", chance: .05, duration: 5, effect: { retentionRate: .95 } }, { name: "소소한 유행어", message: "작품 속 대사 하나가 독자들 사이에서 밈이 되었습니다. 댓글창이 활발해집니다.", chance: .10, duration: 4, effect: { favoriteRate: 1.05, favoritesAbsoluteBonus: 15 } }, { name: "연참의 유혹", message: "오늘따라 글이 술술 써집니다! 고봉밥에 누렁이들이 기뻐합니다.", chance: .08, duration: 2, effect: { retentionRate: 1.01, favoritesAbsoluteBonus: 20 } }, { name: "선작 인증글", message: "한 독자가 커뮤니티에 '이거 재밌다'며 벽갤질을 시작했습니다. 몇몇 독자들이 관심을 보입니다.", chance: .12, duration: 3, effect: { inflowMultiplier: 1.1, favoritesAbsoluteBonus: 30 } }, { name: "사소한 설정오류 지적", message: "한 꼼꼼한 독자가 이전 화의 사소한 설정 오류를 지적했습니다. 일부 독자들이 혼란스러워합니다.", chance: .15, duration: 2, effect: { retentionRate: .99, favoritesAbsolutePenalty: 10 } }, { name: "건강 염려", message: "독자들이 작가의 건강을 걱정하고 있습니다. 마음이 따뜻해집니다.", chance: .10, duration: 1, effect: { favoritesAbsoluteBonus: 10 } }, { name: "경쟁작 휴재", message: "비슷한 장르의 경쟁작이 잠시 휴재에 들어갔습니다. 반사 이익을 얻을지도 모릅니다.", chance: .09, duration: 3, effect: { inflowMultiplier: 1.15 } }, { name: "지각...!", message: "예상치 못한 사정으로 업로드 시간이 조금 늦었습니다. 독자들이 애타게 기다립니다.", chance: .13, duration: 1, effect: { retentionRate: .98, latestViewsAbsolutePenalty: 20 } }, { name: "인상적인 조연", message: "주인공이 아닌 조연 캐릭터가 예상 밖의 인기를 끌고 있습니다.", chance: .10, duration: 5, effect: { favoriteRate: 1.03, favoritesAbsoluteBonus: 25, retentionRate: 1.005 } }, { name: "플랫폼 점검", message: "플랫폼 정기 점검 시간과 연재 시간이 겹쳤습니다. 일부 독자들이 접근에 실패했습니다.", chance: .11, duration: 1, effect: { inflowMultiplier: 0.9 } }, { name: "오타 지적 댓글", message: "친절한 독자들이 댓글로 오타를 교정해주고 있습니다. 작품의 완성도가 올라갑니다...만 조금 부끄럽습니다.", chance: .15, duration: 2, effect: { retentionRate: 1.002, favoritesAbsolutePenalty: 5 } }, { name: "고래 독자 등장", message: "한 '대주주' 독자가 커다란 후원을 보냈습니다! 작가의 창작 의욕이 불타오릅니다!", chance: .07, duration: 3, effect: { favoritesAbsoluteBonus: 100, favoriteRate: 1.1, retentionRate: 1.005 } }, { name: "스포일러 테러", message: "한 악질 독자가 1화 댓글에 미래 전개 스포일러를 남겼습니다! 일부 독자들이 김이 빠졌습니다.", chance: .08, duration: 2, effect: { retentionRate: 0.97, favoritesAbsolutePenalty: 30 } }, { name: "독자의 심층 분석", message: "한 독자가 소설의 떡밥과 설정을 정리한 분석글을 올렸습니다. 독자들의 이해도가 깊어집니다.", chance: .09, duration: 4, effect: { retentionRate: 1.015, favoritesAbsoluteBonus: 40 } }, { name: "의도치 않은 논쟁", message: "의도와 다르게, 한 장면이 독자들 사이에서 뜨거운 논쟁을 일으켰습니다. 댓글창이 불타지만, 어쨌든 관심은 늘었습니다.", chance: .11, duration: 3, effect: { inflowMultiplier: 1.05, retentionRate: 0.99 } }, { name: "작가의 건강 악화", message: "작가가 건강상의 이유로 짧은 지각을 예고했습니다. 독자들과 응원을 보냅니다.", chance: .06, duration: 2, effect: { retentionRate: 0.98, favoritesAbsoluteBonus: 50 } }, { name: "현자타임", message: "엄청난 카타르시스를 느낀 독자들이 '현자타임'에 빠졌습니다. 잠시 소설에서 벗어나려는 독자들이 생깁니다.", chance: .10, duration: 3, effect: { retentionRate: 0.985, inflowMultiplier: 0.95 } }, { name: "하꼬 스트리머 언급", message: "한 하꼬 스트리머가 방송에서 당신의 소설을 추천했습니다! 소규모 신규 유입이 발생합니다.", chance: .05, duration: 4, effect: { inflowMultiplier: 1.3, favoritesAbsoluteBonus: 80 } }, { name: "뜨끈한 국밥", message: "이번 화는 특별할 건 없지만, 속이 든든해지는 '국밥' 같은 전개였습니다. 독자들이 편안함을 느낍니다.", chance: .12, duration: 2, effect: { retentionRate: 1.01, favoriteRate: 1.05 } }, { name: "댓글창 오류", message: "플랫폼 오류로 댓글 작성이 막혔습니다. 소통이 단절되어 독자들이 답답해합니다.", chance: .10, duration: 1, effect: { favoriteRate: 0.9, retentionRate: 0.995 } }, { name: "조연 주식 떡상", message: "생각지도 못한 조연의 주가가 폭등했습니다! 해당 캐릭터의 팬들이 결집하기 시작합니다.", chance: .09, duration: 5, effect: { favoritesAbsoluteBonus: 50, favoriteRate: 1.08, recommendationBonus: 2 } }, { name: "스트레스로 인한 급완결", message: "작품 세계에 운석을 떨어트리고 싶어졌습니다! 모든 것이 무로 돌아가며 이야기는 갑작스럽게 끝을 맺습니다...", chance: .001, duration: 1, effect: { isGameEnding: true }, endReason: "급완결" }, { name: "주화입마로 인한 연재 중단", message: "어느 날 갑자기 작가가 잠적했습니다. 독자들의 기다림 속에서 소설은 미완으로 남게 됩니다.", chance: .003, duration: 1, effect: { isGameEnding: true }, endReason: "작가 잠적으로 인한 연재 중단" }, { name: "해외 출판사 계약", message: "작품의 가능성을 본 해외 대형 출판사에서 거액의 계약을 제안했습니다! 작가는 모든 것을 정리하고 해외로 떠납니다...", chance: .001, duration: 1, effect: { isGameEnding: true }, endReason: "해외 진출로 인한 조기 완결" } ];
 const readerComments=[ {text:"작가님은 신이다... 어떻게 이런 스토리를...",type:"positive",effect:{retentionBonus:.005,favoritesAbsoluteBonus:5}}, {text:"주인공 너무 멋있어요! 제 인생 캐릭터 등극입니다.",type:"positive",effect:{favoritesAbsoluteBonus:4}}, {text:"선추코 후감상합니다. 작가님 믿고 달립니다.",type:"positive",effect:{recommendationBonus:1,favoritesAbsoluteBonus:2}}, {text:"n회차 정주행 중입니다. 다시 봐도 명작이네요.",type:"positive",effect:{retentionBonus:.003,favoritesAbsoluteBonus:2}}, {text:"와, 이번 화 레전드네요. 다음 화 빨리... 현기증 난단 말이에요!",type:"positive",effect:{retentionBonus:.006,favoritesAbsoluteBonus:3}}, {text:"이 작품을 이제야 알았다니... 밤새서 정주행 갑니다.",type:"positive",effect:{retentionBonus:.002,favoritesAbsoluteBonus:8}}, {text:"작가님 건강 챙기면서 연재하세요! 항상 응원합니다.",type:"positive",effect:{favoritesAbsoluteBonus:3}}, {text:"이 히로인이 정실이다. 반박 시 내 말이 맞음.",type:"positive",effect:{recommendationBonus:2}}, {text:"ㅋㅋ 전개가 예상 안돼서 더 재밌음. 팝콘 가져와!",type:"positive",effect:{retentionBonus:.004}}, {text:"월급 들어왔다... 작가님 힘내시라고 선작 박고 갑니다.",type:"positive",effect:{favoritesAbsoluteBonus:10}}, {text:"작가님 폼 미쳤다 진짜 ㅋㅋㅋㅋ", type:"positive", effect:{retentionBonus: .003, favoritesAbsoluteBonus: 3}}, {text:"이 집이 웹소설 맛집이네... 허버허버 퍼먹는 중", type:"positive", effect:{favoritesAbsoluteBonus: 5}}, {text:"세계관 설정이 너무 탄탄해서 소름돋았어요.", type:"positive", effect:{retentionBonus: .004}}, {text:"캐릭터들 케미가 너무 좋아요. 외전 존버합니다.", type:"positive", effect:{favoritesAbsoluteBonus: 4, recommendationBonus: 1}}, {text:"오늘도 제 하루를 책임져주셔서 감사합니다 작가님.", type:"positive", effect:{favoritesAbsoluteBonus: 2}}, {text:"이런 퀄리티가? 바로 후원 박으러 갑니다.", type:"positive", effect:{favoritesAbsoluteBonus: 12}}, {text:"장갤보고 왔는데... 이게 맞다. 개추 박고 간다.", type:"positive", effect:{favoritesAbsoluteBonus: 15, recommendationBonus: 3}}, {text:"뇌 비우고 보기 딱 좋노 ㅋㅋㅋㅋㅋ", type:"positive", effect:{retentionBonus: .005}}, {text:"이궈궈던~", type:"positive", effect:{retentionBonus: .004, favoritesAbsoluteBonus: 6}}, {text:"솔직히 기대 안했는데... 어? 재밌네?", type:"positive", effect:{favoritesAbsoluteBonus: 7, favoriteRate: 1.05}}, {text:"주인공 폼 뭐냐고 ㅋㅋㅋ 반해버렸다", type:"positive", effect:{favoritesAbsoluteBonus: 5}}, {text:"댓글 잘 안다는데 이건 ㅇㅈ함. 작가 힘내라.", type:"positive", effect:{favoritesAbsoluteBonus: 9}}, {text:"한 화 더 '줘'", type:"positive", effect:{retentionBonus: .007}}, {text:"지갑 열렸다... 당장 후원 마렵네", type:"positive", effect:{favoritesAbsoluteBonus: 20}}, {text:"이게... '소설'...? 나는 지금까지 뭘 본거지?", type:"positive", effect:{retentionBonus: .005, favoritesAbsoluteBonus: 8}}, {text:"오늘 연참하면 평생 충성한다", type:"positive", effect:{recommendationBonus: 5}}, {text:"대사 찰진거 보소 ㅋㅋㅋ 작가 필력 좀 치네", type:"positive", effect:{retentionBonus: .004, favoriteRate: 1.02}}, {text:"이걸로 한달 버틴다... 작가야 고맙다...", type:"positive", effect:{favoritesAbsoluteBonus: 7}}, {text:"내 주식 떡상 ㅋㅋㅋㅋㅋ", type:"positive", effect:{recommendationBonus: 3, favoriteRate: 1.05}}, {text:"회사에서 월급루팡하면서 보는데 시간 순삭됨", type:"positive", effect:{retentionBonus: .006}}, {text:"이게 섹스지 시발 ㅋㅋㅋㅋㅋ", type:"positive", effect:{favoritesAbsoluteBonus: 11, retentionBonus: .003}}, {text:"연출만 좀 더 좋았으면 웹툰화 뚝딱인데", type:"positive", effect:{recommendationBonus: 1}}, {text:"조연까지 싹 다 매력적이네. 작가 좀 치노", type:"positive", effect:{favoritesAbsoluteBonus: 6, retentionBonus: .002}}, {text:"일단 선작 박고 1화부터 다시 달려봄", type:"positive", effect:{favoritesAbsoluteBonus: 13}}, {text:"아껴볼걸... 벌써 최신화네... 망했다...", type:"positive", effect:{retentionBonus: .008}}, {text:"누렁이 밥그릇 싹싹 긁어먹었다. 더 '줘'", type:"positive", effect:{favoritesAbsoluteBonus: 4}}, {text:"전개가 너무 느린 거 아닌가요? 답답해요.",type:"negative",effect:{retentionPenalty:.004}}, {text:"음... 설정 오류가 좀 보이는 것 같은데요?",type:"negative",effect:{retentionPenalty:.002,favoritesAbsolutePenalty:1}}, {text:"주인공이 너무 답답해서 하차합니다.",type:"negative",effect:{retentionPenalty:.008,favoritesAbsolutePenalty:3}}, {text:"오타가 너무 많아서 몰입이 깨져요.",type:"negative",effect:{retentionPenalty:.003}}, {text:"전개가 너무 질질 끄는 것 같아요. 고구마 100개 먹은 기분.",type:"negative",effect:{retentionPenalty:.005}}, {text:"주인공 너무 발암인데요; 언제쯤 똑똑해지나요?",type:"negative",effect:{retentionPenalty:.004, favoritesAbsolutePenalty:2}}, {text:"요즘 파워 밸런스가 좀 이상한 것 같아요. 너무 먼치킨 아님?",type:"negative",effect:{retentionPenalty:.002}}, {text:"떡밥 회수는 하고 계신 거죠? 점점 불안해지는데...",type:"negative",effect:{retentionPenalty:.003}}, {text:"초반의 그 신선함은 어디로... 스토리가 산으로 가는 느낌.",type:"negative",effect:{favoritesAbsolutePenalty:4, retentionPenalty:.005}}, {text:"이럴 거면 그냥 조기 완결 내주세요.",type:"negative",effect:{retentionPenalty:.01, favoritesAbsolutePenalty: 5}}, {text:"이 패턴 또 나오네... 작가님 자기복제 좀 심한 듯.", type:"negative", effect:{retentionPenalty: .006, favoritesAbsolutePenalty: 2}}, {text:"최근에 긴장감이 너무 떨어졌어요. 위기감이 없음.", type:"negative", effect:{retentionPenalty: .005}}, {text:"욕하면서 본다 진짜... 주인공 때문에 암 걸릴 것 같음.", type:"negative", effect:{retentionPenalty: .001, favoritesAbsolutePenalty: 1}}, {text:"이번 에피소드 보고 하차할지 결정하겠습니다.", type:"negative", effect:{retentionPenalty: .007}}, {text:"조연들 비중이 너무 공기인데요?", type:"negative", effect:{retentionPenalty: .003, favoritesAbsolutePenalty: 1}}, {text:"작가님 지각... 기다리다 목 빠지겠어요.", type:"negative", effect:{retentionPenalty: .001}}, {text:"하차각 섰냐? 폼 다 뒤졌네", type:"negative", effect:{retentionPenalty: .009, favoritesAbsolutePenalty: 4}}, {text:"국밥 다 식었다... 이제 못먹겠음", type:"negative", effect:{retentionPenalty: .007, favoritesAbsolutePenalty: 2}}, {text:"작가 뇌절 on", type:"negative", effect:{retentionPenalty: .006, favoriteRate: 0.9}}, {text:"캐빨 원툴 소설의 한계인가", type:"negative", effect:{retentionPenalty: .005}}, {text:"이걸 돈주고 보라고? 양심 ㅇㄷ?", type:"negative", effect:{favoritesAbsolutePenalty: 10, retentionPenalty: .008}}, {text:"댓글창 씹창난거 보니 나만 그런게 아니었노 ㅋㅋ", type:"negative", effect:{retentionPenalty: .004}}, {text:"쥔공 능지 실화? 작가 능지 아니지?", type:"negative", effect:{retentionPenalty: .006, favoritesAbsolutePenalty: 3}}, {text:"그래서 떡밥 회수는 언제 하냐고!!!", type:"negative", effect:{retentionPenalty: .004}}, {text:"초반엔 재밌었는데... 유기할 때가 왔나", type:"negative", effect:{retentionPenalty: .007, favoritesAbsolutePenalty: 5}}, {text:"이럴 시간에 퇴고나 한 번 더 해라", type:"negative", effect:{retentionPenalty: .002, favoritesAbsolutePenalty: 1}}, {text:"또 기억상실? 작가님 클리셰 너무 좋아하는거 아니오", type:"negative", effect:{retentionPenalty: .005, favoriteRate: 0.95}}, {text:"악역이 무슨 동네 바보형이냐 긴장감 제로", type:"negative", effect:{retentionPenalty: .006}}, {text:"전개속도 KTX급이네; 감정선 다 날려먹음", type:"negative", effect:{retentionPenalty: .005, favoritesAbsolutePenalty: 2}}, {text:"히로인 왜 갑자기 흑화함? 개연성 어디감?", type:"negative", effect:{retentionPenalty: .009, favoritesAbsolutePenalty: 5}}, {text:"옆집 소설은 연참하는데 여긴 왜...", type:"negative", effect:{favoritesAbsolutePenalty: 4, retentionPenalty: .001}}, {text:"주인공만 너무 편애하네. 파워 인플레 감당 안됨.", type:"negative", effect:{retentionPenalty: .003}}, {text:"억지 감동, 억지 사이다... 토할 것 같음", type:"negative", effect:{retentionPenalty: .007}}, {text:"작가가 자꾸 독자 가르치려 드네", type:"negative", effect:{retentionPenalty: .006, favoritesAbsolutePenalty: 3}}, {text:"이 소설은 이제 죽었다. 명복을 빕니다.", type:"negative", effect:{retentionPenalty: .01, favoritesAbsolutePenalty: 10, favoriteRate: 0.8}}, {text:"접는다. 수고.", type:"negative", effect:{retentionPenalty: .015, favoritesAbsolutePenalty: 8}}, ];
 const narrativeComments={ 'build-up':[ {text:"슬슬 시동 거는구나... 기대됩니다.",type:"positive",effect:{retentionBonus:.002}}, {text:"이번 에피소드 떡밥 까는 중이네. 잘 회수하길.",type:"positive",effect:{}}, {text:"약간 지루한데... 빨리 뭐라도 터졌으면.",type:"negative",effect:{retentionPenalty:.001}}, {text:"폭풍전야... 이 긴장감 너무 좋아.", type:"positive", effect:{retentionBonus: .003}}, {text:"빌드업만 몇 화째냐... 슬슬 피로하다.", type:"negative", effect:{retentionPenalty: .002}}, {text:"슬슬 국밥 데우기 시작하노 ㅋㅋ", type:"positive", effect:{retentionBonus: .003}}, {text:"고구마 1트럭째다... 작가 뿔났다", type:"negative", effect:{retentionPenalty: .003}}, {text:"떡밥 크기 실화냐? 이거 다 회수하면 ㅇㅈ한다", type:"positive", effect:{retentionBonus: .001}}, {text:"숨 참고 흡! 다음 화 내놔!", type:"positive", effect:{retentionBonus: .004}}, {text:"존버... 존버는 승리한다...", type:"positive", effect:{retentionBonus: .001}}, {text:"아직은 누렁이 사료 수준. 좀 더 지켜본다.", type:"positive", effect:{}}, {text:"이번 에피만 보고 계속 볼지 결정함", type:"negative", effect:{}}, {text:"슬슬 재밌어지나? 각 잡나?", type:"positive", effect:{retentionBonus: .002}}, {text:"여기서 더 질질 끌면 민심 떡락한다", type:"negative", effect:{retentionPenalty: .002}}, {text:"이러다 터뜨리면 레전드긴 하겠네", type:"positive", effect:{retentionBonus: .003}}, {text:"복선 까는거 맞지? 그냥 의식의 흐름 아니지?", type:"negative", effect:{retentionPenalty: .001}}, {text:"슬슬 위기감 조성해야하는데 너무 평화롭다", type:"negative", effect:{retentionPenalty: .002}}, {text:"이러려고 어그로 끌었냐? 빨리 터뜨려라", type:"negative", effect:{retentionPenalty: .001}}, {text:"떡밥 노트 정리중이다... 제발 회수해줘", type:"positive", effect:{retentionBonus: .002}}, {text:"사이다패스들 오열중 ㅋㅋㅋㅋㅋ", type:"positive", effect:{}}, {text:"아직은 밍밍하다... 좀 더 자극적으로 가자", type:"negative", effect:{retentionPenalty: .001}}, {text:"주인공 구르기 시작! 팝콘 ON", type:"positive", effect:{retentionBonus: .004}}, {text:"작가가 판을 크게 벌리네... 감당 가능?", type:"negative", effect:{}}, {text:"이번편은 쉬어가는 화인가", type:"negative", effect:{retentionPenalty: .001}}, {text:"이거... 설마... 그 복선인가?", type:"positive", effect:{retentionBonus: .003}}, ], 'climax':[ {text:"와 미쳤다!!! 여기서 끊다니 작가님은 악마야!",type:"climax-comment",effect:{retentionBonus:.01,favoriteRate:1.5,favoritesAbsoluteBonus:10}}, {text:"이게 터지네 ㄷㄷㄷㄷㄷㄷㄷ",type:"climax-comment",effect:{retentionBonus:.008,favoriteRate:1.2,favoritesAbsoluteBonus:8}}, {text:"와... 전율했다... 이 장면 보려고 달려왔구나.",type:"climax-comment",effect:{retentionBonus:.012,favoriteRate:1.8,favoritesAbsoluteBonus:15}}, {text:"미친 전개다 ㅋㅋㅋㅋㅋ 팝콘 가져와!!", type:"climax-comment", effect:{retentionBonus:.009, favoriteRate: 1.3, favoritesAbsoluteBonus: 9}}, {text:"숨도 못 쉬고 봤네... 작가님 사랑해요!", type:"climax-comment", effect:{retentionBonus:.011, favoriteRate: 1.6, favoritesAbsoluteBonus: 12}}, {text:"'만신'", type:"climax-comment", effect:{retentionBonus: .015, favoriteRate: 2.0, favoritesAbsoluteBonus: 25}}, {text:"쌌다... 그냥 말이 안나오네", type:"climax-comment", effect:{retentionBonus: .013, favoriteRate: 1.8, favoritesAbsoluteBonus: 20}}, {text:"이게 만화다... 아니 소설이다...!!", type:"climax-comment", effect:{retentionBonus: .012, favoriteRate: 1.7, favoritesAbsoluteBonus: 18}}, {text:"오늘 갤 터지겠네 ㅋㅋㅋㅋㅋ 성지순례 왔다갑니다", type:"climax-comment", effect:{favoriteRate: 1.5, favoritesAbsoluteBonus: 15, recommendationBonus: 5}}, {text:"아니 여기서 끊어? 작가 나와!!!!!!!!", type:"climax-comment", effect:{retentionBonus: .02}}, {text:"오늘만큼은 신으로 모신다. 제발 다음화...", type:"climax-comment", effect:{retentionBonus: .014, favoritesAbsoluteBonus: 10}}, {text:"국밥충들 기립박수 ㅋㅋㅋㅋㅋ", type:"climax-comment", effect:{retentionBonus: .01, favoriteRate: 1.4, favoritesAbsoluteBonus: 13}}, {text:"이거 보려고 살아왔다 ㄹㅇ...", type:"climax-comment", effect:{retentionBonus: .011, favoritesAbsoluteBonus: 16}}, {text:"미쳤다 그냥. 할 말을 잃었습니다.", type:"climax-comment", effect:{retentionBonus: .01, favoriteRate: 1.6, favoritesAbsoluteBonus: 14}}, {text:"오늘 2편 안주면 작가 집 주소 찾는다 (진심)", type:"climax-comment", effect:{retentionBonus: .018, recommendationBonus: 2}}, {text:"와 ㅋㅋㅋㅋㅋㅋ 작가 미쳤냐고 ㅋㅋㅋㅋㅋㅋ", type:"climax-comment", effect:{retentionBonus: .016, favoriteRate: 1.9, favoritesAbsoluteBonus: 22}}, {text:"도파민 폭발한다ㅏㅏㅏㅏㅏ", type:"climax-comment", effect:{retentionBonus: .014, favoriteRate: 1.8, favoritesAbsoluteBonus: 19}}, {text:"육성으로 '어?' 소리 나옴", type:"climax-comment", effect:{favoriteRate: 1.6, favoritesAbsoluteBonus: 11}}, {text:"오늘 잠 다 잤다. 책임져라 작가.", type:"climax-comment", effect:{retentionBonus: .022}}, {text:"미쳤다는 말밖에 안나온다", type:"climax-comment", effect:{retentionBonus: .013, favoritesAbsoluteBonus: 15}}, {text:"이게... 웹소설? 이게 예술이다.", type:"climax-comment", effect:{retentionBonus: .015, favoritesAbsoluteBonus: 17}}, {text:"몸에 소름돋았음. 전율 그 자체", type:"climax-comment", effect:{retentionBonus: .012, favoritesAbsoluteBonus: 12}}, {text:"전 화랑 온도차 뭐냐고 ㅋㅋㅋㅋㅋㅋㅋ", type:"climax-comment", effect:{retentionBonus: .01, favoriteRate: 1.5}}, {text:"지렸다... 그냥 지렸다...", type:"climax-comment", effect:{retentionBonus: .011, favoritesAbsoluteBonus: 14}}, {text:"작가님 제발 절필만 하지 말아주세요", type:"climax-comment", effect:{retentionBonus: .017, favoritesAbsoluteBonus: 20}}, ], 'resolution':[ {text:"캬... 국밥 한그릇 뚝딱한 것 같은 든든함이다. 사이다!", type:"positive", effect:{retentionBonus: .005, favoritesAbsoluteBonus: 5}}, {text:"떡밥 회수 깔끔해서 좋았습니다. 다음 에피도 기대할게요.", type:"positive", effect:{retentionBonus: .004}}, {text:"응? 이렇게 끝? 뭔가 좀 허무한데...", type:"negative", effect:{retentionPenalty: .003}}, {text:"에필로그까지 완벽했다. 잠시 쉬고 다음 스토리 가시죠!", type:"positive", effect:{retentionBonus: .003, favoritesAbsoluteBonus: 3}}, {text:"갈등 해결 방식이 너무 단순한 거 아닌가요?", type:"negative", effect:{retentionPenalty: .002, favoritesAbsolutePenalty: 2}}, {text:"캬 국밥 든든~하다! 잘 먹고 갑니다", type:"positive", effect:{retentionBonus: .006, favoritesAbsoluteBonus: 4}}, {text:"뇌수 질질 흘리면서 봤네... 떡밥 회수 지렸다", type:"positive", effect:{retentionBonus: .005, favoritesAbsoluteBonus: 7}}, {text:"용두사미 ㅅㄱ", type:"negative", effect:{retentionPenalty: .008, favoritesAbsolutePenalty: 6}}, {text:"흠... 이건 좀... 김새는데", type:"negative", effect:{retentionPenalty: .004, favoritesAbsolutePenalty: 3}}, {text:"이정도면 ㅅㅌㅊ. 다음 에피 드가자~", type:"positive", effect:{retentionBonus: .004}}, {text:"그래서 그 히로인은 어떻게 됐냐고!", type:"negative", effect:{retentionPenalty: .001}}, {text:"에필로그 더 '줘'", type:"positive", effect:{retentionBonus: .002, favoritesAbsoluteBonus: 2}}, {text:"깔끔했다. 작가 폼 안죽었네", type:"positive", effect:{retentionBonus: .005, favoritesAbsoluteBonus: 3}}, {text:"이렇게 쉽게 해결된다고? 주인공 너무 편한거 아님?", type:"negative", effect:{retentionPenalty: .003}}, {text:"한동안 이것만 기다리면서 살겠네", type:"positive", effect:{retentionBonus: .006, favoritesAbsoluteBonus: 5}}, {text:"후... 뽕 다 빠졌다... 현타오네", type:"system", effect:{retentionPenalty: .002}}, {text:"해결방식이 너무 허무맹랑한데... 억지사이다 별로", type:"negative", effect:{retentionPenalty: .005, favoritesAbsolutePenalty: 4}}, {text:"모든 조각이 맞춰졌다. 작가 천재냐?", type:"positive", effect:{retentionBonus: .007, favoritesAbsoluteBonus: 8}}, {text:"에필로그로 외전 떡밥 뿌리네 ㅋㅋㅋ 장사 잘하노", type:"system", effect:{retentionBonus: .003}}, {text:"진짜 완벽한 기승전결이었다.", type:"positive", effect:{retentionBonus: .008, favoritesAbsoluteBonus: 10}}, {text:"이걸로 빌드업 한거면 다음 에피는 얼마나 큰거냐?", type:"system", effect:{retentionBonus: .004}}, {text:"찜찜하게 끝나네... 작가 의도가 뭐지?", type:"negative", effect:{retentionPenalty: .002}}, {text:"끝나니까 아쉽다... 가지마...", type:"positive", effect:{retentionBonus: .003, favoritesAbsoluteBonus: 1}}, {text:"다 좋은데 마지막에 걔는 왜 살려줌?", type:"negative", effect:{retentionPenalty: .003, favoritesAbsolutePenalty: 1}}, {text:"작가 후기까지 정독했다. 다음 에피 존버한다.", type:"positive", effect:{retentionBonus: .005}}, ] };
-
-// ★★★ 주요 변경사항 2 시작: 랭킹 테이블 추가 ★★★
-const rankingTiers = [
-    // 1-11위 (기존 데이터)
-    { views: 12000, rank: '1위' },
-    { views: 10000, rank: '2위' },
-    { views: 9000,  rank: '3위' },
-    { views: 8000,  rank: '4위' },
-    { views: 7000,  rank: '5위' },
-    { views: 6500,  rank: '6위' },
-    { views: 6000,  rank: '7위' },
-    { views: 5700,  rank: '8위' },
-    { views: 5500,  rank: '9위' },
-    { views: 5300,  rank: '10위' },
-    { views: 5000,  rank: '11위' },
-    
-    // 12-19위 (5000 → 4000 선형 보간)
-    { views: 4889,  rank: '12위' },
-    { views: 4778,  rank: '13위' },
-    { views: 4667,  rank: '14위' },
-    { views: 4556,  rank: '15위' },
-    { views: 4444,  rank: '16위' },
-    { views: 4333,  rank: '17위' },
-    { views: 4222,  rank: '18위' },
-    { views: 4111,  rank: '19위' },
-    
-    // 20위 (기존 데이터)
-    { views: 4000,  rank: '20위' },
-    
-    // 21-29위 (4000 → 3000 선형 보간)
-    { views: 3889,  rank: '21위' },
-    { views: 3778,  rank: '22위' },
-    { views: 3667,  rank: '23위' },
-    { views: 3556,  rank: '24위' },
-    { views: 3444,  rank: '25위' },
-    { views: 3333,  rank: '26위' },
-    { views: 3222,  rank: '27위' },
-    { views: 3111,  rank: '28위' },
-    
-    // 30위 (기존 데이터)
-    { views: 3000,  rank: '30위' },
-    
-    // 31-39위 (3000 → 2500 선형 보간)
-    { views: 2944,  rank: '31위' },
-    { views: 2889,  rank: '32위' },
-    { views: 2833,  rank: '33위' },
-    { views: 2778,  rank: '34위' },
-    { views: 2722,  rank: '35위' },
-    { views: 2667,  rank: '36위' },
-    { views: 2611,  rank: '37위' },
-    { views: 2556,  rank: '38위' },
-    
-    // 40위 (기존 데이터)
-    { views: 2500,  rank: '40위' },
-    
-    // 41-49위 (2500 → 2000 선형 보간)
-    { views: 2444,  rank: '41위' },
-    { views: 2389,  rank: '42위' },
-    { views: 2333,  rank: '43위' },
-    { views: 2278,  rank: '44위' },
-    { views: 2222,  rank: '45위' },
-    { views: 2167,  rank: '46위' },
-    { views: 2111,  rank: '47위' },
-    { views: 2056,  rank: '48위' },
-    
-    // 50위 (기존 데이터)
-    { views: 2000,  rank: '50위' },
-    
-    // 51-69위 (2000 → 1500 선형 보간)
-    { views: 1974,  rank: '51위' },
-    { views: 1947,  rank: '52위' },
-    { views: 1921,  rank: '53위' },
-    { views: 1895,  rank: '54위' },
-    { views: 1868,  rank: '55위' },
-    { views: 1842,  rank: '56위' },
-    { views: 1816,  rank: '57위' },
-    { views: 1789,  rank: '58위' },
-    { views: 1763,  rank: '59위' },
-    { views: 1737,  rank: '60위' },
-    { views: 1711,  rank: '61위' },
-    { views: 1684,  rank: '62위' },
-    { views: 1658,  rank: '63위' },
-    { views: 1632,  rank: '64위' },
-    { views: 1605,  rank: '65위' },
-    { views: 1579,  rank: '66위' },
-    { views: 1553,  rank: '67위' },
-    { views: 1526,  rank: '68위' },
-    
-    // 70위 (기존 데이터)
-    { views: 1500,  rank: '70위' },
-    
-    // 71-99위 (1500 → 800 선형 보간)
-    { views: 1476,  rank: '71위' },
-    { views: 1452,  rank: '72위' },
-    { views: 1428,  rank: '73위' },
-    { views: 1404,  rank: '74위' },
-    { views: 1379,  rank: '75위' },
-    { views: 1355,  rank: '76위' },
-    { views: 1331,  rank: '77위' },
-    { views: 1307,  rank: '78위' },
-    { views: 1283,  rank: '79위' },
-    { views: 1259,  rank: '80위' },
-    { views: 1234,  rank: '81위' },
-    { views: 1210,  rank: '82위' },
-    { views: 1186,  rank: '83위' },
-    { views: 1162,  rank: '84위' },
-    { views: 1138,  rank: '85위' },
-    { views: 1114,  rank: '86위' },
-    { views: 1090,  rank: '87위' },
-    { views: 1066,  rank: '88위' },
-    { views: 1041,  rank: '89위' },
-    { views: 1017,  rank: '90위' },
-    { views: 993,   rank: '91위' },
-    { views: 969,   rank: '92위' },
-    { views: 945,   rank: '93위' },
-    { views: 921,   rank: '94위' },
-    { views: 897,   rank: '95위' },
-    { views: 872,   rank: '96위' },
-    { views: 848,   rank: '97위' },
-    { views: 824,   rank: '98위' },
-    { views: 812,   rank: '99위' },
-    
-    // 100위 (기존 데이터)
-    { views: 800,   rank: '100위' },
-    
-    // 기존 구간별 데이터
-    { views: 700,   rank: '상위 5%' },
-    { views: 600,   rank: '상위 10%' },
-    { views: 400,   rank: '상위 20%' },
-    { views: 0,     rank: '순위권 밖' }
-];
-
-// ★★★ 주요 변경사항 2 끝 ★★★
-
+const rankingTiers = [ { views: 12000, rank: '1위' }, { views: 10000, rank: '2위' }, { views: 9000,  rank: '3위' }, { views: 8000,  rank: '4위' }, { views: 7000,  rank: '5위' }, { views: 6500,  rank: '6위' }, { views: 6000,  rank: '7위' }, { views: 5700,  rank: '8위' }, { views: 5500,  rank: '9위' }, { views: 5300,  rank: '10위' }, { views: 5000,  rank: '11위' }, { views: 4889,  rank: '12위' }, { views: 4778,  rank: '13위' }, { views: 4667,  rank: '14위' }, { views: 4556,  rank: '15위' }, { views: 4444,  rank: '16위' }, { views: 4333,  rank: '17위' }, { views: 4222,  rank: '18위' }, { views: 4111,  rank: '19위' }, { views: 4000,  rank: '20위' }, { views: 3889,  rank: '21위' }, { views: 3778,  rank: '22위' }, { views: 3667,  rank: '23위' }, { views: 3556,  rank: '24위' }, { views: 3444,  rank: '25위' }, { views: 3333,  rank: '26위' }, { views: 3222,  rank: '27위' }, { views: 3111,  rank: '28위' }, { views: 3000,  rank: '30위' }, { views: 2944,  rank: '31위' }, { views: 2889,  rank: '32위' }, { views: 2833,  rank: '33위' }, { views: 2778,  rank: '34위' }, { views: 2722,  rank: '35위' }, { views: 2667,  rank: '36위' }, { views: 2611,  rank: '37위' }, { views: 2556,  rank: '38위' }, { views: 2500,  rank: '40위' }, { views: 2444,  rank: '41위' }, { views: 2389,  rank: '42위' }, { views: 2333,  rank: '43위' }, { views: 2278,  rank: '44위' }, { views: 2222,  rank: '45위' }, { views: 2167,  rank: '46위' }, { views: 2111,  rank: '47위' }, { views: 2056,  rank: '48위' }, { views: 2000,  rank: '50위' }, { views: 1974,  rank: '51위' }, { views: 1947,  rank: '52위' }, { views: 1921,  rank: '53위' }, { views: 1895,  rank: '54위' }, { views: 1868,  rank: '55위' }, { views: 1842,  rank: '56위' }, { views: 1816,  rank: '57위' }, { views: 1789,  rank: '58위' }, { views: 1763,  rank: '59위' }, { views: 1737,  rank: '60위' }, { views: 1711,  rank: '61위' }, { views: 1684,  rank: '62위' }, { views: 1658,  rank: '63위' }, { views: 1632,  rank: '64위' }, { views: 1605,  rank: '65위' }, { views: 1579,  rank: '66위' }, { views: 1553,  rank: '67위' }, { views: 1526,  rank: '68위' }, { views: 1500,  rank: '70위' }, { views: 1476,  rank: '71위' }, { views: 1452,  rank: '72위' }, { views: 1428,  rank: '73위' }, { views: 1404,  rank: '74위' }, { views: 1379,  rank: '75위' }, { views: 1355,  rank: '76위' }, { views: 1331,  rank: '77위' }, { views: 1307,  rank: '78위' }, { views: 1283,  rank: '79위' }, { views: 1259,  rank: '80위' }, { views: 1234,  rank: '81위' }, { views: 1210,  rank: '82위' }, { views: 1186,  rank: '83위' }, { views: 1162,  rank: '84위' }, { views: 1138,  rank: '85위' }, { views: 1114,  rank: '86위' }, { views: 1090,  rank: '87위' }, { views: 1066,  rank: '88위' }, { views: 1041,  rank: '89위' }, { views: 1017,  rank: '90위' }, { views: 993,   rank: '91위' }, { views: 969,   rank: '92위' }, { views: 945,   rank: '93위' }, { views: 921,   rank: '94위' }, { views: 897,   rank: '95위' }, { views: 872,   rank: '96위' }, { views: 848,   rank: '97위' }, { views: 824,   rank: '98위' }, { views: 812,   rank: '99위' }, { views: 800,   rank: '100위' }, { views: 700,   rank: '상위 5%' }, { views: 600,   rank: '상위 10%' }, { views: 400,   rank: '상위 20%' }, { views: 0,     rank: '순위권 밖' } ];
 const BASE_RETENTION_RATE=0.96; const MAX_CHART_ITEMS=15;
 const BASE_TICK_INTERVAL = 500;
 const BASE_CHAPTER_INTERVAL = 5000;
@@ -1065,6 +614,8 @@ const BASE_CHAPTER_INTERVAL = 5000;
 let gameState={}; let tickInterval,chapterInterval; let dailyGrowthChart,latestViewsTrendChart;
 const setupScreen=document.getElementById('setup-screen'),simScreen=document.getElementById('simulation-screen'),resultModal=document.getElementById('result-modal');
 const startButton=document.getElementById('start-button'),restartButton=document.getElementById('restart-button');
+// ★★★ 변경점 1번: 확인 버튼 DOM 요소 추가 ★★★
+const closeModalButton = document.getElementById('close-modal-button');
 const mainTagsContainer=document.getElementById('main-tags-container'),subTagsContainer=document.getElementById('sub-tags-container');
 const timelineLog=document.getElementById('timeline-log');
 
@@ -1073,26 +624,148 @@ function populateTags(){mainTags.forEach(tag=>{const id=`main-${tag}`,item=`<div
 function setupEventListeners(){
     startButton.addEventListener('click',startGame);
     restartButton.addEventListener('click',()=>location.reload());
+    // ★★★ 변경점 1번: 확인 버튼 이벤트 리스너 추가 ★★★
+    closeModalButton.addEventListener('click', () => { resultModal.style.display = 'none'; });
     subTagsContainer.addEventListener('change',e=>{const c=document.querySelectorAll('input[name="sub-tag"]:checked'),l=document.getElementById('sub-tag-limit-msg');if(c.length>6){e.target.checked=false;l.textContent='서브 태그는 최대 6개까지 선택할 수 있습니다.';setTimeout(()=>l.textContent='',2000)}});
     document.getElementById('speed-1x').addEventListener('click', () => setSpeed(1));
     document.getElementById('speed-1_5x').addEventListener('click', () => setSpeed(1.5));
     document.getElementById('speed-2x').addEventListener('click', () => setSpeed(2));
+    document.getElementById('speed-4x').addEventListener('click', () => setSpeed(4));
 }
 
-function startGame(){const t=document.getElementById('novel-title').value,m=document.querySelector('input[name="main-tag"]:checked');if(!t.trim()){alert('작품 제목을 입력해주세요.');return}if(!m){alert('메인 태그를 선택해주세요.');return}const s=Array.from(document.querySelectorAll('input[name="sub-tag"]:checked')).map(el=>el.value);resetGameState();
-gameState.mainTag = m.value;
-gameState.subTags = s;
-const allTags = [m.value, ...s];
-document.getElementById('novel-tags-display').textContent = allTags.map(tag => `#${tag}`).join(' ');
-document.getElementById('novel-title-display').textContent=`「${t}」`;calculatePublicAppeal(m.value,s);setupScreen.style.display='none';simScreen.style.display='block';initCharts();gameState.isRunning=true;
-tickInterval=setInterval(updateTick, BASE_TICK_INTERVAL / gameState.speedMultiplier);
-chapterInterval=setInterval(publishNewChapter, BASE_CHAPTER_INTERVAL / gameState.speedMultiplier);
-addLogMessage('event','연재 시작',gameState.date)}
+function startGame(){
+    const title = document.getElementById('novel-title').value;
+    const authorName = document.getElementById('author-name').value;
+    const synopsis = document.getElementById('novel-synopsis').value;
+    const mainTag = document.querySelector('input[name="main-tag"]:checked');
 
-function endGame(reason){if(!gameState.isRunning)return;gameState.isRunning=false;clearInterval(tickInterval);clearInterval(chapterInterval); const finalChapters=gameState.chapter;const finalTotalViews=Math.floor(gameState.chapterViews.reduce((a,b)=>a+b,0));const finalTotalFavorites=Math.floor(gameState.totalFavorites);const finalTotalRecommendations=Math.floor(gameState.totalRecommendations);const totalEarnings=finalTotalViews*10;const totalWritingTime=finalChapters*4;const hourlyWage=totalWritingTime>0?Math.floor(totalEarnings/totalWritingTime):0;document.getElementById('result-title').textContent=`${finalChapters}화 ${reason}`;document.getElementById('end-reason').textContent=reason==='대완결'?'마침내 250화의 대장정을 끝내고 작품을 완결시켰습니다!':(reason==='유료화 실패'?'15화 기준 조회수 200을 넘지 못해 유료화에 실패했습니다...':(reason==='완결'?'오랜 연재 끝에 드디어 작품을 완결냈습니다!':'독자들의 관심이 끊겨 연재를 지속할 수 없게 되었습니다...'));document.getElementById('final-total-views').textContent=finalTotalViews.toLocaleString();document.getElementById('final-total-favorites').textContent=finalTotalFavorites.toLocaleString();document.getElementById('final-total-recommendations').textContent=finalTotalRecommendations.toLocaleString();document.getElementById('final-writing-time').textContent=totalWritingTime.toLocaleString();document.getElementById('final-earnings').textContent=totalEarnings.toLocaleString();document.getElementById('final-hourly-wage').textContent=hourlyWage.toLocaleString();resultModal.style.display='flex'}
+    if (!title.trim()) { alert('작품 제목을 입력해주세요.'); return; }
+    if (!authorName.trim()) { alert('작가명을 입력해주세요.'); return; }
+    if (!synopsis.trim()) { alert('소개글을 입력해주세요.'); return; }
+    if (!mainTag) { alert('메인 태그를 선택해주세요.'); return; }
+    
+    const subTags = Array.from(document.querySelectorAll('input[name="sub-tag"]:checked')).map(el => el.value);
+    
+    resetGameState();
+    
+    gameState.novelTitle = title;
+    gameState.authorName = authorName;
+    gameState.novelSynopsis = synopsis;
+    gameState.mainTag = mainTag.value;
+    gameState.subTags = subTags;
 
-function resetGameState(){ gameState={ isRunning:false, chapter:0, totalFavorites:0, totalRecommendations:0, publicAppealScore:1, hypeMultiplier:1, loyalReaderConversionRate:0.8, activeEvents:[], readersReachedLatest:0, chapterViews:[], date:new Date(2024,0,1), previousTotalViews:0, dailyGrowthChartLabels:[], dailyGrowthChartData:[], latestViewsTrendLabels:[], latestViewsTrendData:[], narrativeProgress:0, narrativeState:'build-up', narrativeCycleCount:1, readerFatigue:0,  naturalDecay: 1.0,  viewGrowthMomentum: 0,  peakLatestViews: 0,  peakDailyGrowth: 0,  mainTag: '',  subTags: [], speedMultiplier: 1 } }
+    const allTags = [mainTag.value, ...subTags];
+    document.getElementById('novel-tags-display').textContent = allTags.map(tag => `#${tag}`).join(' ');
+    document.getElementById('novel-title-display').textContent = `「${title}」`;
+    document.getElementById('author-name-display').textContent = `By. ${authorName}`;
+    document.getElementById('novel-synopsis-display').textContent = synopsis;
 
+    calculatePublicAppeal(mainTag.value, subTags);
+    setupScreen.style.display = 'none';
+    simScreen.style.display = 'block';
+    initCharts();
+    gameState.isRunning = true;
+
+    tickInterval = setInterval(updateTick, BASE_TICK_INTERVAL / gameState.speedMultiplier);
+    chapterInterval = setInterval(publishNewChapter, BASE_CHAPTER_INTERVAL / gameState.speedMultiplier);
+    
+    addLogMessage('event', '연재 시작', gameState.date);
+}
+
+function endGame(reason){
+    if(!gameState.isRunning) return;
+    gameState.isRunning = false;
+    clearInterval(tickInterval);
+    clearInterval(chapterInterval);
+
+    const finalChapters = gameState.chapter;
+    const totalViews = gameState.chapterViews.reduce((a, b) => a + b, 0);
+    const finalTotalViews = Math.floor(totalViews);
+    const finalTotalFavorites = Math.floor(gameState.totalFavorites);
+    const finalTotalRecommendations = Math.floor(gameState.totalRecommendations);
+    const totalEarnings = finalTotalViews * 10;
+    const totalWritingTime = finalChapters * 4;
+    const hourlyWage = totalWritingTime > 0 ? Math.floor(totalEarnings / totalWritingTime) : 0;
+    const monthlyWage = hourlyWage * 120; // 월급 환산
+    const finalPeakDailyGrowth = Math.floor(gameState.peakDailyGrowth); // ★★★ 변경점 2번: 최고 일일 조회수 변수
+
+    document.getElementById('result-title').textContent = `${gameState.novelTitle}`;
+    document.getElementById('final-author-name').textContent = `By. ${gameState.authorName}`;
+    
+    const endReasonMessages = {
+        '대완결': `마침내 ${finalChapters}화의 대장정을 끝내고 작품을 완결시켰습니다!`,
+        '유료화 실패': '15화 기준 조회수 200을 넘지 못해 유료화에 실패했습니다...',
+        '완결': `오랜 연재 끝에 ${finalChapters}화로 작품을 완결냈습니다!`,
+        '연재 부진': '독자들의 관심이 끊겨 연재를 지속할 수 없게 되었습니다...'
+    };
+    document.getElementById('end-reason').textContent = endReasonMessages[reason] || reason;
+    document.getElementById('final-novel-synopsis').textContent = gameState.novelSynopsis;
+
+    document.getElementById('final-total-views').textContent = finalTotalViews.toLocaleString();
+    document.getElementById('final-total-favorites').textContent = finalTotalFavorites.toLocaleString();
+    document.getElementById('final-peak-ranking').textContent = gameState.peakRanking;
+    // ★★★ 변경점 2번: '평균 최신화 조회수' 대신 '최고 일일 조회수' 표시 ★★★
+    document.getElementById('final-peak-daily-growth').textContent = finalPeakDailyGrowth.toLocaleString();
+
+    document.getElementById('final-earnings').textContent = `${totalEarnings.toLocaleString()}원`;
+    document.getElementById('final-hourly-wage').textContent = `${hourlyWage.toLocaleString()}원`;
+    document.getElementById('final-monthly-wage').textContent = `${monthlyWage.toLocaleString()}원`;
+    document.getElementById('final-writing-time').textContent = `${totalWritingTime.toLocaleString()}시간`;
+    document.getElementById('final-total-events').textContent = `${gameState.totalEventsTriggered.toLocaleString()}회`;
+    document.getElementById('final-positive-comments').textContent = `${gameState.positiveCommentsCount.toLocaleString()}회`;
+    document.getElementById('final-negative-comments').textContent = `${gameState.negativeCommentsCount.toLocaleString()}회`;
+    document.getElementById('final-total-recommendations').textContent = finalTotalRecommendations.toLocaleString();
+
+    // ★★★ 변경점 4번: 업적 계산 및 표시 로직 ★★★
+    displayAchievements(finalTotalViews, gameState.positiveCommentsCount, gameState.negativeCommentsCount, gameState.totalEventsTriggered, monthlyWage, gameState.peakRankingValue);
+
+    resultModal.style.display = 'flex';
+}
+
+// ★★★ 변경점 4번: 업적 표시를 위한 함수 추가 ★★★
+function displayAchievements(totalViews, positiveComments, negativeComments, totalEvents, monthlyWage, peakRankValue) {
+    const achievementsList = document.getElementById('achievements-list');
+    let unlockedAchievements = [];
+
+    if (totalViews >= 1000000) unlockedAchievements.push('🏆 밀리언 클럽: 총 조회수 100만 이상');
+    if (totalViews >= 3000000) unlockedAchievements.push('🥉 브론즈 펜슬: 총 조회수 300만 이상');
+    if (totalViews >= 10000000) unlockedAchievements.push('🥈 실버 펜슬: 총 조회수 1000만 이상');
+    if (totalViews >= 20000000) unlockedAchievements.push('🥇 골드 펜슬: 총 조회수 2000만 이상');
+    
+    if (positiveComments >= 300) unlockedAchievements.push('👍 선플 좋아요: 긍정적 반응 300회 이상');
+    if (negativeComments >= 300) unlockedAchievements.push('👎 악플 싫어요: 부정적 반응 300회 이상');
+    
+    if (totalEvents >= 50) unlockedAchievements.push('🎢 좌충우돌: 총 이벤트 발생 수 50회 이상');
+    
+    if (monthlyWage >= 2000000) unlockedAchievements.push('🍚 그래도 글먹은 했다: 월급 환산 200만 이상');
+    if (monthlyWage >= 5000000) unlockedAchievements.push('🍜 캬~ 든든하다: 월급 환산 500만 이상');
+    if (monthlyWage >= 10000000) unlockedAchievements.push('💰 월천킥 작가: 월급 환산 1000만 이상');
+    
+    if (peakRankValue <= 10) unlockedAchievements.push('⚔️ 실랭 정복자: 최고 실시간 랭킹 10위 이상');
+    if (peakRankValue <= 5) unlockedAchievements.push('👑 실랭 파괴자: 최고 실시간 랭킹 5위 이상');
+    if (peakRankValue === 1) unlockedAchievements.push('⭐ 1등 작가: 최고 실시간 랭킹 1위 달성');
+
+    if (unlockedAchievements.length > 0) {
+        achievementsList.innerHTML = unlockedAchievements.map(achText => `<div class="achievement-item">${achText}</div>`).join('');
+    } else {
+        achievementsList.innerHTML = `<div class="achievement-item">달성한 업적이 없습니다.</div>`;
+    }
+}
+
+
+function resetGameState(){ 
+    gameState={
+        isRunning:false, 
+        novelTitle: '',
+        authorName: '',
+        novelSynopsis: '',
+        mainTag: '',  
+        subTags: [], 
+        chapter:0, totalFavorites:0, totalRecommendations:0, publicAppealScore:1, hypeMultiplier:1, loyalReaderConversionRate:0.8, activeEvents:[], readersReachedLatest:0, chapterViews:[], date:new Date(2024,0,1), previousTotalViews:0, dailyGrowthChartLabels:[], dailyGrowthChartData:[], latestViewsTrendLabels:[], latestViewsTrendData:[], narrativeProgress:0, narrativeState:'build-up', narrativeCycleCount:1, readerFatigue:0, naturalDecay: 1.0, viewGrowthMomentum: 0, peakLatestViews: 0, peakDailyGrowth: 0, speedMultiplier: 1, peakRanking: '순위권 밖', peakRankingValue: 9999, totalEventsTriggered: 0, positiveCommentsCount: 0, negativeCommentsCount: 0
+    } 
+}
+// 이하 publishNewChapter, updateTick 등 다른 함수들은 변경점이 없거나 사소한 UI 연동 로직만 수정되므로, 기존 코드를 그대로 사용합니다.
+// ... (기존과 동일한 나머지 JS 코드) ...
 function publishNewChapter(){if(!gameState.isRunning)return;const finalViews=gameState.chapter>0?gameState.chapterViews[gameState.chapter-1]:0;
 if(gameState.chapter>1){const prevViews=gameState.latestViewsTrendData[gameState.latestViewsTrendData.length-1];if(finalViews>prevViews){gameState.hypeMultiplier=Math.min(1.3,gameState.hypeMultiplier*1.05)}else{gameState.hypeMultiplier=Math.max(0.9,gameState.hypeMultiplier*0.9)}}
 if(gameState.chapter>0){gameState.latestViewsTrendData.push(Math.floor(finalViews));gameState.latestViewsTrendLabels.push(`${gameState.chapter}화`);if(gameState.latestViewsTrendData.length>MAX_CHART_ITEMS){gameState.latestViewsTrendData.shift();gameState.latestViewsTrendLabels.shift()}
@@ -1124,6 +797,7 @@ if(gameState.narrativeProgress<70){gameState.narrativeState='build-up'}else if(g
 if(gameState.chapter>0&&gameState.chapter%10===0){gameState.loyalReaderConversionRate=Math.max(0.1,gameState.loyalReaderConversionRate-0.03);addLogMessage('system',`장기 연재로 충성 독자 전환율이 ${(gameState.loyalReaderConversionRate*100).toFixed(0)}%로 조정되었습니다.`)}
 const loyalBonus=gameState.totalFavorites*gameState.loyalReaderConversionRate*gameState.hypeMultiplier*(0.98+Math.random()*.04);
 gameState.chapterViews[gameState.chapter-1]+=loyalBonus;handleRandomEvents();updateActiveEvents();updateUI()}
+
 function updateTick(){if(!gameState.isRunning||gameState.chapter===0)return;const eventEffects=getActiveEventEffects();let commentEffect={retentionBonus:0,retentionPenalty:0,favoritesAbsoluteBonus:0,favoritesAbsolutePenalty:0,recommendationBonus:0,favoriteRate:1};const commentChance=Math.random();
 if(commentChance<.25){
 let commentPool,comment;
@@ -1131,7 +805,9 @@ if(gameState.narrativeState==='climax'&&Math.random()<.5){commentPool=narrativeC
 else if(gameState.narrativeState==='build-up'&&Math.random()<.4){commentPool=narrativeComments['build-up']}
 else if(gameState.narrativeState==='resolution'&&Math.random()<.4){commentPool=narrativeComments.resolution}
 else{commentPool=readerComments}
-comment=commentPool[Math.floor(Math.random()*commentPool.length)];const targetChapter=Math.floor(Math.random()*gameState.chapter)+1;addLogMessage(comment.type,comment.text,gameState.date,targetChapter);commentEffect={...commentEffect,...comment.effect}}
+comment=commentPool[Math.floor(Math.random()*commentPool.length)];const targetChapter=Math.floor(Math.random()*gameState.chapter)+1;addLogMessage(comment.type,comment.text,gameState.date,targetChapter);commentEffect={...commentEffect,...comment.effect}
+if (comment.type === 'positive' || comment.type === 'climax-comment') { gameState.positiveCommentsCount++; } else if (comment.type === 'negative') { gameState.negativeCommentsCount++; }
+}
 const baseInflow=10;let narrativeMultiplier=1;if(gameState.narrativeState==='build-up')narrativeMultiplier=.97;else if(gameState.narrativeState==='climax')narrativeMultiplier=1.08;const fatiguePenalty=1-gameState.readerFatigue*.1;
 let longTermBonus = 1.0;
 if (gameState.chapter > 150) {longTermBonus = 1.2;} else if (gameState.chapter > 100) {longTermBonus = 1.1;} else if (gameState.chapter > 50) {longTermBonus = 1.05;}
@@ -1143,20 +819,68 @@ for(let i=0;i<gameState.chapter;i++){gameState.chapterViews[i]+=readersPropagati
 let finalRetentionRate=(BASE_RETENTION_RATE*eventEffects.retentionRate*gameState.hypeMultiplier*narrativeMultiplier*fatiguePenalty*gameState.naturalDecay)+commentEffect.retentionBonus-commentEffect.retentionPenalty;
 finalRetentionRate=Math.min(finalRetentionRate,0.999);
 readersPropagating*=finalRetentionRate}
-gameState.readersReachedLatest=readersPropagating;gameState.totalFavorites+=(newReaders*.05*eventEffects.favoriteRate*commentEffect.favoriteRate)+commentEffect.favoritesAbsoluteBonus-commentEffect.favoritesAbsolutePenalty;if(gameState.totalFavorites<0)gameState.totalFavorites=0;gameState.totalRecommendations+=newReaders*.01+commentEffect.recommendationBonus;updateUI()}
-function calculatePublicAppeal(main,subs){let score=1;if(tagCompatibility[main]){subs.forEach(sub=>{score*=tagCompatibility[main][sub]||.9})}gameState.publicAppealScore=score}
-function handleRandomEvents() { if (gameState.activeEvents.length > 0) return; const eventPool = randomEvents.filter(e => { if (e.name === "레전드 회차" && gameState.narrativeState !== 'climax') return false; return true }); for (const event of eventPool) { if (Math.random() < event.chance) { if (event.effect && event.effect.isGameEnding) { addLogMessage('penalty', `[치명적 이벤트] ${event.message}`, gameState.date); endGame(event.endReason || '급완결'); break; }  else { const newEvent = { ...event, remaining: event.duration }; gameState.activeEvents.push(newEvent); let type = 'event'; if (newEvent.effect.favoritesPenaltyRate || newEvent.effect.favoritesAbsolutePenalty || newEvent.effect.latestViewsAbsolutePenalty) { type = 'penalty'; } if (newEvent.effect.favoritesMultiplier) gameState.totalFavorites *= newEvent.effect.favoritesMultiplier; if (newEvent.effect.favoritesAbsoluteBonus) { gameState.totalFavorites += newEvent.effect.favoritesAbsoluteBonus; } if (newEvent.effect.favoritesAbsolutePenalty) { gameState.totalFavorites -= newEvent.effect.favoritesAbsolutePenalty; if (gameState.totalFavorites < 0) gameState.totalFavorites = 0; } if (newEvent.effect.latestViewsAbsoluteBonus && gameState.chapter > 0) { for (let i = 0; i < gameState.chapter; i++) { gameState.chapterViews[i] += newEvent.effect.latestViewsAbsoluteBonus; } } if (newEvent.effect.latestViewsAbsolutePenalty && gameState.chapter > 0) { gameState.chapterViews[gameState.chapter - 1] -= newEvent.effect.latestViewsAbsolutePenalty; if (gameState.chapterViews[gameState.chapter - 1] < 0) gameState.chapterViews[gameState.chapter - 1] = 0; } if (newEvent.effect.favoritesPenaltyRate) { gameState.totalFavorites *= (1 - newEvent.effect.favoritesPenaltyRate); } addLogMessage(type, `[이벤트] ${newEvent.message}`, gameState.date); break; } } } }
+gameState.readersReachedLatest=readersPropagating;
+// ★★★ 변경점 3번: 회차별 선작량 증가 배율 적용 ★★★
+let chapterFavoritesMultiplier;
+if (gameState.chapter <= 15) { chapterFavoritesMultiplier = 1.2; }
+else if (gameState.chapter <= 45) { chapterFavoritesMultiplier = 1.5; }
+else if (gameState.chapter <= 100) { chapterFavoritesMultiplier = 1.1; }
+else if (gameState.chapter <= 125) { chapterFavoritesMultiplier = 1.0; }
+else if (gameState.chapter <= 200) { chapterFavoritesMultiplier = 0.8; }
+else { chapterFavoritesMultiplier = 0.6; }
 
-// ★★★ 주요 변경사항 3 시작: 랭킹 계산 함수 추가 ★★★
-function getRealtimeRanking(views) {
-    for (const tier of rankingTiers) {
-        if (views >= tier.views) {
-            return tier.rank;
-        }
-    }
-    return '순위권 밖'; // 기본값
+gameState.totalFavorites+=(newReaders*.05*chapterFavoritesMultiplier*eventEffects.favoriteRate*commentEffect.favoriteRate)+commentEffect.favoritesAbsoluteBonus-commentEffect.favoritesAbsolutePenalty;
+if(gameState.totalFavorites<0)gameState.totalFavorites=0;
+gameState.totalRecommendations+=newReaders*.01+commentEffect.recommendationBonus;
+updateUI()
 }
-// ★★★ 주요 변경사항 3 끝 ★★★
+function calculatePublicAppeal(main,subs){let score=1;if(tagCompatibility[main]){subs.forEach(sub=>{score*=tagCompatibility[main][sub]||.9})}gameState.publicAppealScore=score}
+
+function handleRandomEvents() {
+    if (gameState.activeEvents.length > 0) return;
+    const eventPool = randomEvents.filter(e => {
+        if (e.name === "레전드 회차" && gameState.narrativeState !== 'climax') return false;
+        return true;
+    });
+    const triggeredEvents = eventPool.filter(event => Math.random() < event.chance);
+    if (triggeredEvents.length > 0) {
+        const chosenEvent = triggeredEvents[Math.floor(Math.random() * triggeredEvents.length)];
+        gameState.totalEventsTriggered++;
+        if (chosenEvent.effect && chosenEvent.effect.isGameEnding) {
+            addLogMessage('penalty', `[치명적 이벤트] ${chosenEvent.message}`, gameState.date);
+            endGame(chosenEvent.endReason || '급완결');
+            return;
+        }
+        const newEvent = { ...chosenEvent, remaining: chosenEvent.duration };
+        gameState.activeEvents.push(newEvent);
+        let type = 'event';
+        if (newEvent.effect.favoritesPenaltyRate || newEvent.effect.favoritesAbsolutePenalty || newEvent.effect.latestViewsAbsolutePenalty) {
+            type = 'penalty';
+        }
+        if (newEvent.effect.favoritesMultiplier) gameState.totalFavorites *= newEvent.effect.favoritesMultiplier;
+        if (newEvent.effect.favoritesAbsoluteBonus) gameState.totalFavorites += newEvent.effect.favoritesAbsoluteBonus;
+        if (newEvent.effect.favoritesAbsolutePenalty) {
+            gameState.totalFavorites -= newEvent.effect.favoritesAbsolutePenalty;
+            if (gameState.totalFavorites < 0) gameState.totalFavorites = 0;
+        }
+        if (newEvent.effect.latestViewsAbsoluteBonus && gameState.chapter > 0) {
+            for (let i = 0; i < gameState.chapter; i++) {
+                gameState.chapterViews[i] += newEvent.effect.latestViewsAbsoluteBonus;
+            }
+        }
+        if (newEvent.effect.latestViewsAbsolutePenalty && gameState.chapter > 0) {
+            gameState.chapterViews[gameState.chapter - 1] -= newEvent.effect.latestViewsAbsolutePenalty;
+            if (gameState.chapterViews[gameState.chapter - 1] < 0) gameState.chapterViews[gameState.chapter - 1] = 0;
+        }
+        if (newEvent.effect.favoritesPenaltyRate) {
+            gameState.totalFavorites *= (1 - newEvent.effect.favoritesPenaltyRate);
+        }
+        addLogMessage(type, `[이벤트] ${newEvent.message}`, gameState.date);
+    }
+}
+
+function getRealtimeRanking(views) { for (const tier of rankingTiers) { if (views >= tier.views) { return tier.rank; } } return '순위권 밖'; }
+function getRankValue(rankStr) { if (rankStr.includes('위')) { return parseInt(rankStr); } if (rankStr.includes('상위')) return 101; return 9999; }
 
 function setSpeed(newMultiplier) {
     gameState.speedMultiplier = newMultiplier;
@@ -1164,6 +888,7 @@ function setSpeed(newMultiplier) {
     if (newMultiplier === 1) document.getElementById('speed-1x').classList.add('active');
     else if (newMultiplier === 1.5) document.getElementById('speed-1_5x').classList.add('active');
     else if (newMultiplier === 2) document.getElementById('speed-2x').classList.add('active');
+    else if (newMultiplier === 4) document.getElementById('speed-4x').classList.add('active');
     if (gameState.isRunning) {
         clearInterval(tickInterval);
         clearInterval(chapterInterval);
@@ -1172,6 +897,7 @@ function setSpeed(newMultiplier) {
     }
     addLogMessage('system', `게임 속도가 ${newMultiplier}배로 변경되었습니다.`);
 }
+
 function updateActiveEvents(){gameState.activeEvents.forEach(e=>e.remaining--);gameState.activeEvents=gameState.activeEvents.filter(e=>e.remaining>0)}
 function getActiveEventEffects(){const e={inflowMultiplier:1,retentionRate:1,favoriteRate:1};gameState.activeEvents.forEach(v=>{for(const k in v.effect){if(!k.includes('Absolute')&&!k.includes('PenaltyRate')&&!k.includes('Multiplier'))e[k]*=v.effect[k]}});return e}
 function addLogMessage(type,message,date,chapter=null){const entry=document.createElement('div');entry.className='log-entry';let metaText='시스템 메시지';if(date){metaText=`${date.getMonth()+1}월 ${date.getDate()}일`;if(['positive','negative','climax-comment'].includes(type)){metaText+=` / ${chapter}화 반응`}else if(type==='system'){metaText+=` / 시스템`}}entry.innerHTML=`<p class="log-meta">${metaText}</p><p class="log-text ${type}">${message}</p>`;timelineLog.prepend(entry);if(timelineLog.children.length>50)timelineLog.lastChild.remove()}
@@ -1186,15 +912,18 @@ function updateUI(){
     document.getElementById('total-favorites').textContent=Math.floor(gameState.totalFavorites).toLocaleString();
     document.getElementById('total-recommendations').textContent=Math.floor(gameState.totalRecommendations).toLocaleString();
     document.getElementById('total-views').textContent=Math.floor(totalViews).toLocaleString();
-    
     document.getElementById('peak-latest-views').textContent = Math.floor(gameState.peakLatestViews).toLocaleString();
     document.getElementById('peak-daily-growth').textContent = Math.floor(gameState.peakDailyGrowth).toLocaleString();
     
-    // ★★★ 주요 변경사항 4 시작: '평균 최신화 조회수' 관련 로직을 '실시간 랭킹' 로직으로 교체 ★★★
-    document.getElementById('realtime-ranking').textContent = getRealtimeRanking(latestViews);
-    const avgDaily = gameState.dailyGrowthChartData.length > 0 ? gameState.dailyGrowthChartData.reduce((a, b) => a + b, 0) / gameState.dailyGrowthChartData.length : 0;
-    document.getElementById('avg-daily-growth').textContent = Math.floor(avgDaily).toLocaleString();
-    // ★★★ 주요 변경사항 4 끝 ★★★
+    const currentRank = getRealtimeRanking(latestViews);
+    document.getElementById('realtime-ranking').textContent = currentRank;
+
+    const currentRankValue = getRankValue(currentRank);
+    if (currentRankValue < gameState.peakRankingValue) {
+        gameState.peakRankingValue = currentRankValue;
+        gameState.peakRanking = currentRank;
+    }
+    document.getElementById('peak-realtime-ranking').textContent = gameState.peakRanking;
     
     const totalEarnings = Math.floor(totalViews * 10);
     const totalWritingTime = gameState.chapter * 4;
@@ -1205,8 +934,36 @@ function updateUI(){
     document.getElementById('current-hourly-wage').textContent = `[시급: ${hourlyWage.toLocaleString()}원]`;
 
     const progressFill=document.getElementById('narrative-progress-fill');const statusText=document.getElementById('narrative-status-text');const progress=gameState.narrativeProgress>100?100:gameState.narrativeProgress;progressFill.style.width=`${progress}%`;let stateText='';let stateClass='';switch(gameState.narrativeState){case'build-up':stateText=`에피소드 ${gameState.narrativeCycleCount} - 빌드업`;stateClass='build-up';break;case'climax':stateText=`에피소드 ${gameState.narrativeCycleCount} - 절정`;stateClass='climax';break;case'resolution':stateText=`에피소드 ${gameState.narrativeCycleCount} - 마무리`;stateClass='resolution';break}
-    progressFill.className=`${stateClass}`;statusText.textContent=`${stateText} (${progress.toFixed(0)}%)`}
-function initCharts(){const dailyCtx=document.getElementById('daily-growth-chart').getContext('2d');dailyGrowthChart=new Chart(dailyCtx,{type:'bar',data:{labels:[],datasets:[{label:'일일 조회수 증가량',data:[],backgroundColor:'rgba(66, 183, 42, 0.7)',borderColor:'rgba(66, 183, 42, 1)',borderWidth:1}]},options:{scales:{y:{beginAtZero:true,ticks:{callback:v=>v.toLocaleString()}}}}});const latestViewsCtx=document.getElementById('latest-views-trend-chart').getContext('2d');latestViewsTrendChart=new Chart(latestViewsCtx,{type:'line',data:{labels:[],datasets:[{label:'최신화 최종 조회수',data:[],backgroundColor:'rgba(24, 119, 242, 0.2)',borderColor:'rgba(24, 119, 242, 1)',borderWidth:2,fill:true,tension:.2}]},options:{scales:{y:{beginAtZero:true,ticks:{callback:v=>v.toLocaleString()}}}}})}
+    progressFill.className=`${stateClass}`;statusText.textContent=`${stateText} (${progress.toFixed(0)}%)`;
+}
+
+function initCharts(){
+    const textColor = 'rgba(224, 224, 224, 0.8)';
+    const gridColor = 'rgba(224, 224, 224, 0.1)';
+    const chartOptions = {
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: { callback: v => v.toLocaleString(), color: textColor },
+                grid: { color: gridColor }
+            },
+            x: {
+                ticks: { color: textColor },
+                grid: { color: gridColor }
+            }
+        },
+        plugins: {
+            legend: {
+                labels: { color: textColor }
+            }
+        }
+    };
+    const dailyCtx=document.getElementById('daily-growth-chart').getContext('2d');
+    dailyGrowthChart=new Chart(dailyCtx,{type:'bar',data:{labels:[],datasets:[{label:'일일 조회수 증가량',data:[],backgroundColor:'rgba(46, 204, 113, 0.7)',borderColor:'rgba(46, 204, 113, 1)',borderWidth:1}]},options:chartOptions});
+    
+    const latestViewsCtx=document.getElementById('latest-views-trend-chart').getContext('2d');
+    latestViewsTrendChart=new Chart(latestViewsCtx,{type:'line',data:{labels:[],datasets:[{label:'최신화 최종 조회수',data:[],backgroundColor:'rgba(79, 109, 255, 0.2)',borderColor:'rgba(79, 109, 255, 1)',borderWidth:2,fill:true,tension:.2}]},options:chartOptions})
+}
 function updateDailyGrowthChart(){if(dailyGrowthChart){dailyGrowthChart.data.labels=gameState.dailyGrowthChartLabels;dailyGrowthChart.data.datasets[0].data=gameState.dailyGrowthChartData;dailyGrowthChart.update()}}
 function updateLatestViewsTrendChart(){if(latestViewsTrendChart){latestViewsTrendChart.data.labels=gameState.latestViewsTrendLabels;latestViewsTrendChart.data.datasets[0].data=gameState.latestViewsTrendData;latestViewsTrendChart.update()}}
 
