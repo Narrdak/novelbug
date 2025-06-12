@@ -1269,6 +1269,10 @@ function displayAchievements(totalViews, positiveComments, negativeComments, tot
     const achievementsList = document.getElementById('achievements-list');
     let unlockedAchievements = [];
 
+    // gameState에서 직접 값을 가져오도록 수정
+    const totalFavorites = Math.floor(gameState.totalFavorites);
+    const peakDailyGrowth = Math.floor(gameState.peakDailyGrowth);
+
     if (totalViews >= 1000000) unlockedAchievements.push('🏆 밀리언 클럽: 총 조회수 100만 이상');
     if (totalViews >= 3000000) unlockedAchievements.push('🥉 브론즈 펜슬: 총 조회수 300만 이상');
     if (totalViews >= 10000000) unlockedAchievements.push('🥈 실버 펜슬: 총 조회수 1000만 이상');
@@ -1279,11 +1283,13 @@ function displayAchievements(totalViews, positiveComments, negativeComments, tot
     if (negativeComments >= 200) unlockedAchievements.push('👎 악플 싫어요: 부정적 반응 200회 이상');
     if (negativeComments >= 300) unlockedAchievements.push('👎 어그로 콜렉터: 부정적 반응 300회 이상');
 
+    // 수정한 변수 사용
     if (totalFavorites >= 10000) unlockedAchievements.push('❤️ 꾸준한 인기작: 총 선호작 1만 달성');
     if (totalFavorites >= 20000) unlockedAchievements.push('💖 모두의 최애작: 총 선호작 2만 달성');
     if (totalFavorites >= 30000) unlockedAchievements.push('⭐ 플랫폼의 아이돌: 총 선호작 3만 달성');
     if (totalFavorites >= 50000) unlockedAchievements.push('⭐ 영원불멸의 전설: 총 선호작 5만 달성');
 
+    // 수정한 변수 사용
     if (peakDailyGrowth >= 10000) unlockedAchievements.push('📈 실시간 급상승: 최고 일일 조회수 1만 달성');
     if (peakDailyGrowth >= 50000) unlockedAchievements.push('🚀 역주행의 신화: 최고 일일 조회수 5만 달성');
     if (peakDailyGrowth >= 100000) unlockedAchievements.push('💥 서버 마비의 주범: 최고 일일 조회수 10만 달성');
