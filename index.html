@@ -1591,26 +1591,34 @@ function calculatePublicAppeal(main, subs) {
     let score = 1;
     if (tagCompatibility[main]) {
         subs.forEach(sub => {
-            score *= tagCompatibility[main][sub] || .9;
+            // tagCompatibility에 정의되지 않은 태그는 0.9의 페널티를 받습니다.
+            score *= tagCompatibility[main][sub] || 0.9;
         });
     }
 
-    // --- 1단계: 태그 조합 점수 영향력 1.3배 증폭 ---
-    const deviation = score - 1;
-    const amplifiedDeviation = deviation * 1.3;
-    const amplifiedScore = 1 + amplifiedDeviation;
+    // --- 1단계: 태그 조합 점수 보너스/페널티 증폭 ---
+    let amplifiedScore;
+    const bonusAmplifier = 1.3; // 보너스를 증폭시키는 비율
+    const penaltyAmplifier = 1.5; // 페널티를 증폭시키는 비율
 
-    // --- [여기가 바로 신규 추가된 부분입니다] ---
+    if (score >= 1) {
+        // 점수가 1 이상일 때 (시너지 보너스)
+        const bonus = score - 1;
+        const amplifiedBonus = bonus * bonusAmplifier;
+        amplifiedScore = 1 + amplifiedBonus;
+    } else {
+        // 점수가 1 미만일 때 (조합 페널티)
+        const penalty = 1 - score;
+        const amplifiedPenalty = penalty * penaltyAmplifier;
+        // 최종 점수는 0 이하로 내려가지 않도록 보정합니다.
+        amplifiedScore = Math.max(0.1, 1 - amplifiedPenalty); // 최소 점수를 0.1로 제한
+    }
+
     // --- 2단계: 메인 태그 자체의 페널티 적용 ---
-    
-    // 1. mainTagPenalties 객체에서 현재 메인 태그(main)에 해당하는 페널티 값을 가져옵니다.
-    //    만약 해당하는 값이 없으면, 페널티가 없는 1.0을 기본값으로 사용합니다.
     const penaltyFactor = mainTagPenalties[main] || 1.0;
 
-    // 2. 증폭된 조합 점수에 메인 태그 페널티를 곱하여 최종 점수를 계산합니다.
+    // --- 3단계: 최종 점수 계산 및 저장 ---
     const finalScoreWithPenalty = amplifiedScore * penaltyFactor;
-
-    // 최종 점수를 게임 상태에 저장합니다.
     gameState.publicAppealScore = finalScoreWithPenalty;
 }
 
